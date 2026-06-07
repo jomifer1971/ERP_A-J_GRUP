@@ -91,10 +91,21 @@ export default function ParteDiarioForm() {
 
       if (!isSupabaseConfigured) {
         // Fallback directly to simulated data
-        setObras(MOCK_OBRAS);
+        const savedObras = localStorage.getItem('aj_obras_v2');
+        let currentObrasList = MOCK_OBRAS;
+        if (savedObras) {
+          try {
+            currentObrasList = JSON.parse(savedObras);
+          } catch {}
+        } else {
+          localStorage.setItem('aj_obras_v2', JSON.stringify(MOCK_OBRAS));
+        }
+        setObras(currentObrasList);
         setOperarios(MOCK_OPERARIOS);
         setSelectedOperarioId(MOCK_OPERARIOS[0].id);
-        setSelectedObraId(MOCK_OBRAS[0].id);
+        if (currentObrasList.length > 0) {
+          setSelectedObraId(currentObrasList[0].id);
+        }
         setUsingSimulatedData(true);
         setLoading(false);
         return;
@@ -128,8 +139,13 @@ export default function ParteDiarioForm() {
           setSelectedObraId(dbObras[0].id);
         } else {
           // No active obras returned, fallback to mock to make the UI testable
-          setObras(MOCK_OBRAS);
-          setSelectedObraId(MOCK_OBRAS[0].id);
+          const savedObras = localStorage.getItem('aj_obras_v2');
+          let currentObrasList = MOCK_OBRAS;
+          if (savedObras) {
+            try { currentObrasList = JSON.parse(savedObras); } catch {}
+          }
+          setObras(currentObrasList);
+          if (currentObrasList.length > 0) setSelectedObraId(currentObrasList[0].id);
         }
 
         if (dbOperarios && dbOperarios.length > 0) {
@@ -145,8 +161,15 @@ export default function ParteDiarioForm() {
         console.warn('Fallo al conectar con Supabase, usando datos simulados:', err.message);
         setErrorStatus(err.message);
         setUsingSimulatedData(true);
-        setObras(MOCK_OBRAS);
-        setSelectedObraId(MOCK_OBRAS[0].id);
+        
+        const savedObras = localStorage.getItem('aj_obras_v2');
+        let currentObrasList = MOCK_OBRAS;
+        if (savedObras) {
+          try { currentObrasList = JSON.parse(savedObras); } catch {}
+        }
+        setObras(currentObrasList);
+        if (currentObrasList.length > 0) setSelectedObraId(currentObrasList[0].id);
+        
         setOperarios(MOCK_OPERARIOS);
         setSelectedOperarioId(MOCK_OPERARIOS[0].id);
       } finally {

@@ -9,8 +9,9 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ParteDiarioForm from './components/ParteDiarioForm';
 import Logo from './components/Logo';
-import { LogOut, User as UserIcon, Database, Wifi, WifiOff } from 'lucide-react';
+import { LogOut, User as UserIcon, Database, Wifi, WifiOff, LayoutDashboard, Briefcase } from 'lucide-react';
 import { isSupabaseConfigured } from './config/supabaseClient';
+import ObrasTab from './components/ObrasTab';
 
 export default function App() {
   const currentYear = new Date().getFullYear();
@@ -26,6 +27,8 @@ export default function App() {
     }
     return null;
   });
+
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'obras'>('dashboard');
 
   const handleLogin = (loggedInUser: Usuario) => {
     setUser(loggedInUser);
@@ -86,23 +89,56 @@ export default function App() {
       </header>
 
       {/* 2. MAIN RESPONSIVE CONTENT AREA */}
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-        {isAdmin ? (
-          <AdminDashboard user={user} />
-        ) : (
-          <div className="flex flex-col gap-6 items-center">
-            <div className="w-full max-w-md">
-              <div className="mb-6 flex flex-col gap-1 items-center text-center">
-                <span className="text-[10px] font-mono font-black text-[#07474e] uppercase tracking-widest leading-none">Portal de Obra</span>
-                <h2 className="text-2xl font-extrabold text-[#0f172a] tracking-tight">Registro de Partes</h2>
-                <p className="text-xs text-[#64748b] leading-relaxed max-w-sm mt-2">
-                  Registra de forma segura tus horas y materiales para el seguimiento en las oficinas centrales de A&J GRUP BCN.
-                </p>
-              </div>
-              
-              <ParteDiarioForm />
-            </div>
+      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6">
+        
+        {/* Navigation Tabs */}
+        <div className="flex justify-center sm:justify-start border-b border-gray-200">
+          <div className="flex gap-1 -mb-px">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm font-mono font-bold uppercase border-b-2 transition-all ${
+                activeTab === 'dashboard'
+                  ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-2xl'
+                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              {isAdmin ? 'Panel General' : 'Registrar Parte'}
+            </button>
+            <button
+              onClick={() => setActiveTab('obras')}
+              className={`flex items-center gap-2 px-5 py-3 text-xs md:text-sm font-mono font-bold uppercase border-b-2 transition-all ${
+                activeTab === 'obras'
+                  ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-2xl'
+                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'
+              }`}
+            >
+              <Briefcase className="w-4 h-4" />
+              Obras y Planos
+            </button>
           </div>
+        </div>
+
+        {activeTab === 'dashboard' ? (
+          isAdmin ? (
+            <AdminDashboard user={user} />
+          ) : (
+            <div className="flex flex-col gap-6 items-center">
+              <div className="w-full max-w-md">
+                <div className="mb-6 flex flex-col gap-1 items-center text-center">
+                  <span className="text-[10px] font-mono font-black text-[#07474e] uppercase tracking-widest leading-none">Portal de Obra</span>
+                  <h2 className="text-2xl font-extrabold text-[#0f172a] tracking-tight">Registro de Partes</h2>
+                  <p className="text-xs text-[#64748b] leading-relaxed max-w-sm mt-2">
+                    Registra de forma segura tus horas y materiales para el seguimiento en las oficinas centrales de A&J GRUP BCN.
+                  </p>
+                </div>
+                
+                <ParteDiarioForm />
+              </div>
+            </div>
+          )
+        ) : (
+          <ObrasTab user={user} />
         )}
       </main>
 
