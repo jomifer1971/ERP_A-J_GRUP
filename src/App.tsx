@@ -128,108 +128,14 @@ export default function App() {
 
       {/* 2. MAIN RESPONSIVE CONTENT AREA */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6">
-        
-        {/* DESKTOP NAVIGATION TABS: Hidden on mobile (md breakpoint), elegant flat on PC */}
-        <div className="hidden md:flex flex-wrap gap-2 border-b border-gray-200 pb-2">
-          {isAdmin && (
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-                activeTab === 'dashboard'
-                  ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                  : 'border-transparent text-gray-500 hover:text-gray-800'
-              }`}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              Mando Central
-            </button>
-          )}
-
-          <button
-            onClick={() => setActiveTab('fichaje')}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-              activeTab === 'fichaje'
-                ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Clock8 className="w-3.5 h-3.5" />
-            Registrar Parte / Fichaje
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('obras')}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-              activeTab === 'obras'
-                ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5" />
-            Obras y Planos
-          </button>
-
-          <button
-            onClick={() => setActiveTab('almacenes')}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-              activeTab === 'almacenes'
-                ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <Warehouse className="w-3.5 h-3.5" />
-            Almacenes y OCR
-          </button>
-
-          <button
-            onClick={() => setActiveTab('cuenta')}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-              activeTab === 'cuenta'
-                ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            Ficha y Estadísticas
-          </button>
-
-          {isAdmin && (
-            <>
-              <button
-                onClick={() => setActiveTab('turnos')}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-                  activeTab === 'turnos'
-                    ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                    : 'border-transparent text-gray-500 hover:text-gray-800'
-                }`}
-              >
-                <Clock8 className="w-3.5 h-3.5 text-indigo-700 animate-pulse" />
-                Turnos y Horarios
-              </button>
-
-              <button
-                onClick={() => setActiveTab('roles')}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-bold uppercase border-b-2 transition-all ${
-                  activeTab === 'roles'
-                    ? 'border-[#07474e] text-[#07474e] bg-white rounded-t-xl'
-                    : 'border-transparent text-gray-500 hover:text-gray-800'
-                }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-rose-600" />
-                Seguridad / Roles
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* MOBILE COLLAPSIBLE MENU: Visible on mobile, hides on medium+ viewports */}
-        <div className="md:hidden flex flex-col gap-2 relative w-full mb-1">
+              {/* UNIFIED COLLAPSIBLE NAVIGATION MENU: Responsive on both mobile and computer */}
+        <div className="flex flex-col gap-2 relative w-full md:max-w-xl mx-auto mb-1 select-none">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="w-full flex items-center justify-between gap-3 p-4 bg-[#07474e] hover:bg-[#0b5c65] text-white rounded-2xl shadow-sm transition-all focus:outline-none"
           >
-            <div className="flex items-center gap-2 text-xs font-black font-mono uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs md:text-sm font-black font-mono uppercase tracking-wider">
               {activeTab === 'dashboard' && <LayoutDashboard className="w-4 h-4 text-emerald-400" />}
               {activeTab === 'fichaje' && <Clock8 className="w-4 h-4 text-teal-300" />}
               {activeTab === 'obras' && <Briefcase className="w-4 h-4 text-amber-400" />}
@@ -252,14 +158,16 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-mono font-bold tracking-wide text-teal-155 opacity-90 border border-teal-200/25 px-2 py-0.5 rounded-md bg-white/10">Tocar para cambiar</span>
+              <span className="text-[9px] font-mono font-bold tracking-wide text-teal-100 opacity-90 border border-teal-200/25 px-2 py-0.5 rounded-md bg-white/10 hidden xs:inline-block">
+                {devicePlatform === 'pc' ? 'Click para cambiar' : 'Tocar para cambiar'}
+              </span>
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </div>
           </button>
 
           {/* Collapsible Dropdown Overlaid list */}
           {mobileMenuOpen && (
-            <div className="absolute top-14 left-0 w-full bg-white border border-gray-250 rounded-2xl shadow-xl z-50 p-2.5 flex flex-col gap-1.5 animate-fadeIn">
+            <div className="absolute top-14 left-0 w-full bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-2.5 flex flex-col gap-1.5 animate-fadeIn">
               {isAdmin && (
                 <button
                   type="button"

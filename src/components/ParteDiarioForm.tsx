@@ -239,6 +239,29 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
           setSelectedOperarioId(MOCK_OPERARIOS[0].id);
         }
 
+        // Try load fichajes and partes from database
+        try {
+          const { data: dbFichajes } = await supabase
+            .from('fichajes')
+            .select('*')
+            .order('fecha_hora', { ascending: false });
+          if (dbFichajes && dbFichajes.length > 0) {
+            setFichajes(dbFichajes);
+            localStorage.setItem('aj_fichajes_v2', JSON.stringify(dbFichajes));
+          }
+          
+          const { data: dbPartes } = await supabase
+            .from('partes_trabajo')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (dbPartes && dbPartes.length > 0) {
+            setPartesHoy(dbPartes);
+            localStorage.setItem('aj_partes_hoy', JSON.stringify(dbPartes));
+          }
+        } catch (subErr) {
+          console.warn('Could not load specific sub-tables of parts & clockings:', subErr);
+        }
+
         setUsingSimulatedData(false);
       } catch (err: any) {
         console.warn('Fallo al conectar con Supabase, usando datos simulados:', err.message);

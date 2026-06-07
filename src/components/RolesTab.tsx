@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Usuario } from '../types';
+import { supabase, isSupabaseConfigured } from '../config/supabaseClient';
 import { Shield, ShieldAlert, ShieldCheck, UserPlus, Trash2, Key, Check, X, RefreshCw, Lock, Unlock } from 'lucide-react';
 
 const ESPECIALIDADES_OPCIONES = [
@@ -34,16 +35,47 @@ export default function RolesTab({ user }: RolesTabProps) {
 
   // Hydrate local users database
   useEffect(() => {
-    const saved = localStorage.getItem('aj_users_v2');
-    if (saved) {
-      try {
-        setUsuarios(JSON.parse(saved));
-      } catch {
-        initializeDefaultUsers();
+    const loadUsers = async () => {
+      let loaded = false;
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await supabase
+            .from('usuarios')
+            .select('*');
+          if (!error && data && data.length > 0) {
+            const mapped: Usuario[] = data.map((dbU: any) => ({
+              id: dbU.id,
+              nombre: dbU.nombre,
+              email: dbU.email,
+              rol: dbU.rol,
+              validado: dbU.validado,
+              especialidades: dbU.especialidades || [],
+              jefeId: dbU.jefe_id,
+              telefono: dbU.telefono
+            }));
+            setUsuarios(mapped);
+            localStorage.setItem('aj_users_v2', JSON.stringify(mapped));
+            loaded = true;
+          }
+        } catch (err) {
+          console.warn('No se pudo cargar desde Supabase:', err);
+        }
       }
-    } else {
-      initializeDefaultUsers();
-    }
+      
+      if (!loaded) {
+        const saved = localStorage.getItem('aj_users_v2');
+        if (saved) {
+          try {
+            setUsuarios(JSON.parse(saved));
+          } catch {
+            initializeDefaultUsers();
+          }
+        } else {
+          initializeDefaultUsers();
+        }
+      }
+    };
+    loadUsers();
   }, []);
 
   const initializeDefaultUsers = () => {
@@ -58,9 +90,27 @@ export default function RolesTab({ user }: RolesTabProps) {
     localStorage.setItem('aj_users_v2', JSON.stringify(defaults));
   };
 
-  const saveToStorage = (updated: Usuario[]) => {
+  const saveToStorage = async (updated: Usuario[]) => {
     setUsuarios(updated);
     localStorage.setItem('aj_users_v2', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        const formattedUsers = updated.map(u => ({
+          id: u.id,
+          nombre: u.nombre,
+          email: u.email,
+          rol: u.rol,
+          validado: u.validado,
+          especialidades: u.especialidades || [],
+          jefe_id: u.jefeId || null,
+          telefono: u.telefono || null
+        }));
+        await supabase.from('usuarios').upsert(formattedUsers);
+      } catch (err) {
+        console.warn('Omitido guardar en Supabase (tabla no sinc aún):', err);
+      }
+    }
   };
 
   // Shield: Approve / Block user immediately
@@ -171,7 +221,7 @@ export default function RolesTab({ user }: RolesTabProps) {
   };
 
   // Delete worker node
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     if (userId === 'u-1' || userId === 'u-2') {
       showError('Las cuentas maestras de sistema (CEO y Admin principal) están blindadas contra borrados.');
       return;
@@ -179,7 +229,15 @@ export default function RolesTab({ user }: RolesTabProps) {
 
     if (window.confirm('¿Estás seguro de que deseas eliminar permanentemente a este usuario? Perderá todo acceso al instante.')) {
       const updated = usuarios.filter(u => u.id !== userId);
-      saveToStorage(updated);
+      await saveToStorage(updated);
+      
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from('usuarios').delete().eq('id', userId);
+        } catch (err) {
+          console.warn('Error delete de usuario Supabase:', err);
+        }
+      }
       showSuccess('Usuario eliminado permanentemente del sistema.');
     }
   };

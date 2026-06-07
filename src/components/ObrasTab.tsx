@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Obra, Usuario } from '../types';
+import { supabase, isSupabaseConfigured } from '../config/supabaseClient';
 import { 
   Briefcase, 
   MapPin, 
@@ -213,17 +214,97 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
   const [pinturaAlto, setPinturaAlto] = useState<number>(2.5);
   const [pinturaCapas, setPinturaCapas] = useState<number>(2);
 
-  // Sync state with localStorage
+  // Sync state with localStorage and Supabase
   useEffect(() => {
     localStorage.setItem('aj_obras_v2', JSON.stringify(obras));
     if (onRefreshObras) {
       onRefreshObras();
     }
+    
+    // Remote Sync if configured
+    if (isSupabaseConfigured && obras.length > 0) {
+      const syncObras = async () => {
+        try {
+          const formattedObras = obras.map(o => ({
+            id: o.id,
+            nombre: o.nombre,
+            direccion: o.direccion,
+            estado: o.estado,
+            geovalla_activa: o.geovalla_activa ?? true,
+            latitud: o.latitud,
+            longitud: o.longitud,
+            radio: o.radio ?? 150
+          }));
+          await supabase.from('obras').upsert(formattedObras);
+        } catch (err) {
+          console.warn('Error al sincronizar obras con Supabase:', err);
+        }
+      };
+      syncObras();
+    }
   }, [obras]);
 
   useEffect(() => {
     localStorage.setItem('aj_obras_documentos', JSON.stringify(documentos));
+    
+    // Remote Sync if configured
+    if (isSupabaseConfigured && documentos.length > 0) {
+      const syncDocs = async () => {
+        try {
+          const formattedDocs = documentos.map(d => ({
+            id: d.id,
+            obra_id: d.obraId,
+            nombre: d.nombre,
+            tipo: d.tipo,
+            size: d.size,
+            fecha: d.fecha,
+            subido_por: d.subidoPor,
+            aprobado: d.aprobado,
+            aprobado_por: d.aprobadoPor,
+            file_data: d.fileData
+          }));
+          await supabase.from('obras_documentos').upsert(formattedDocs);
+        } catch (err) {
+          console.warn('Error al sincronizar documentos con Supabase:', err);
+        }
+      };
+      syncDocs();
+    }
   }, [documentos]);
+
+  // Fetch from Supabase on mount if configured
+  useEffect(() => {
+    if (isSupabaseConfigured) {
+      const fetchObrasAndDocs = async () => {
+        try {
+          const { data: dbObras, error: oError } = await supabase.from('obras').select('*');
+          if (!oError && dbObras && dbObras.length > 0) {
+            setObras(dbObras as Obra[]);
+          }
+          
+          const { data: dbDocs, error: dError } = await supabase.from('obras_documentos').select('*');
+          if (!dError && dbDocs && dbDocs.length > 0) {
+            const mappedDocs: DocumentoObra[] = dbDocs.map((d: any) => ({
+              id: d.id,
+              obraId: d.obra_id,
+              nombre: d.nombre,
+              tipo: d.tipo,
+              size: d.size,
+              fecha: d.fecha,
+              subidoPor: d.subido_por,
+              aprobado: d.aprobado,
+              aprobadoPor: d.aprobado_por,
+              fileData: d.file_data
+            }));
+            setDocumentos(mappedDocs);
+          }
+        } catch (err) {
+          console.warn('Error al recuperar obras/docs de Supabase:', err);
+        }
+      };
+      fetchObrasAndDocs();
+    }
+  }, []);
 
   // Address lookup controller
   const handleAddressChange = async (val: string) => {
@@ -332,11 +413,18 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
   };
 
   // Delete Obra (safe confirmation)
-  const handleDeleteObra = (id: string) => {
+  const handleDeleteObra = async (id: string) => {
     if (confirm('¿Seguro que deseas eliminar esta obra? Se desasociarán sus partes de trabajo.')) {
       setObras(prev => prev.filter(o => o.id !== id));
       if (selectedObraId === id) {
         setSelectedObraId(obras[0]?.id || '');
+      }
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from('obras').delete().eq('id', id);
+        } catch (err) {
+          console.warn('Error delete de obra Supabase:', err);
+        }
       }
     }
   };
@@ -450,9 +538,16 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
   };
 
   // Delete Document
-  const handleDeleteDoc = (docId: string) => {
+  const handleDeleteDoc = async (docId: string) => {
     if (confirm('¿Seguro que deseas eliminar este plano/documento de la obra?')) {
       setDocumentos(prev => prev.filter(d => d.id !== docId));
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from('obras_documentos').delete().eq('id', docId);
+        } catch (err) {
+          console.warn('Error delete de documento Supabase:', err);
+        }
+      }
     }
   };
 

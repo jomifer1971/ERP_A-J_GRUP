@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Usuario, ParteTrabajo } from '../types';
 import { User, FileText, Upload, Calendar, CheckCircle2, ThumbsUp, AlertCircle, BarChart3, Clock, HelpCircle, BadgeAlert, Sparkles, Building, Trash2 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../config/supabaseClient';
 
 interface CuentaTabProps {
   user: Usuario;
@@ -63,44 +64,87 @@ export default function CuentaTab({ user }: CuentaTabProps) {
     }
 
     // Hydrate doc justifications
-    const savedDocs = localStorage.getItem('aj_justificantes');
-    if (savedDocs) {
-      try {
-        setDocs(JSON.parse(savedDocs));
-      } catch {}
-    } else {
-      const defaultDocs: JustificanteDoc[] = [
-        {
-          id: 'doc-1',
-          tipo: 'cita_medica',
-          fechaInicio: '2026-06-03',
-          fechaFin: '2026-06-03',
-          motivo: 'Visita Dentista Seguridad Social - Barcelona Dental',
-          fileName: 'Justificante_Dentista_030626.pdf',
-          fileSize: '452 KB',
-          uploadDate: '2026-06-03 14:22',
-          estado: 'APROBADO'
-        },
-        {
-          id: 'doc-2',
-          tipo: 'baja_medica',
-          fechaInicio: '2026-06-05',
-          fechaFin: '2026-06-09',
-          motivo: 'Recuperación tras esguince leve de tobillo',
-          fileName: 'Informe_Baja_CAP_Mallorca.pdf',
-          fileSize: '1.2 MB',
-          uploadDate: '2026-06-05 09:12',
-          estado: 'PENDIENTE'
+    const loadDocs = async () => {
+      let isLoadedFromSupabase = false;
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await supabase
+            .from('justificantes')
+            .select('*')
+            .eq('usuario_id', user.id);
+          
+          if (!error && data && data.length > 0) {
+            const mapped: JustificanteDoc[] = data.map((doc: any) => ({
+              id: doc.id,
+              tipo: doc.tipo,
+              fechaInicio: doc.fecha_inicio,
+              fechaFin: doc.fecha_fin,
+              motivo: doc.motivo,
+              fileName: doc.file_name || 'justificante.pdf',
+              fileSize: doc.file_size || '250 KB',
+              uploadDate: doc.upload_date || '',
+              estado: doc.estado
+            }));
+            setDocs(mapped);
+            localStorage.setItem('aj_justificantes', JSON.stringify(mapped));
+            isLoadedFromSupabase = true;
+          }
+        } catch (err) {
+          console.warn('Fallo al cargar justificantes de Supabase:', err);
         }
-      ];
-      setDocs(defaultDocs);
-      localStorage.setItem('aj_justificantes', JSON.stringify(defaultDocs));
-    }
-  }, []);
+      }
 
-  const saveDocsToLocalStorage = (updated: JustificanteDoc[]) => {
+      if (!isLoadedFromSupabase) {
+        const savedDocs = localStorage.getItem('aj_justificantes');
+        if (savedDocs) {
+          try {
+            setDocs(JSON.parse(savedDocs));
+          } catch {}
+        } else {
+          const defaultDocs: JustificanteDoc[] = [
+            {
+              id: 'doc-1',
+              tipo: 'cita_medica',
+              fechaInicio: '2026-06-03',
+              fechaFin: '2026-06-03',
+              motivo: 'Visita Dentista Seguridad Social - Barcelona Dental',
+              fileName: 'Justificante_Dentista_030626.pdf',
+              fileSize: '452 KB',
+              uploadDate: '2026-06-03 14:22',
+              estado: 'APROBADO'
+            },
+            {
+              id: 'doc-2',
+              tipo: 'baja_medica',
+              fechaInicio: '2026-06-05',
+              fechaFin: '2026-06-09',
+              motivo: 'Recuperación tras esguince leve de tobillo',
+              fileName: 'Informe_Baja_CAP_Mallorca.pdf',
+              fileSize: '1.2 MB',
+              uploadDate: '2026-06-05 09:12',
+              estado: 'PENDIENTE'
+            }
+          ];
+          setDocs(defaultDocs);
+          localStorage.setItem('aj_justificantes', JSON.stringify(defaultDocs));
+        }
+      }
+    };
+
+    loadDocs();
+  }, [user]);
+
+  const saveDocsToLocalStorage = async (updated: JustificanteDoc[], deletedId?: string) => {
     setDocs(updated);
     localStorage.setItem('aj_justificantes', JSON.stringify(updated));
+
+    if (isSupabaseConfigured && deletedId) {
+      try {
+        await supabase.from('justificantes').delete().eq('id', deletedId);
+      } catch (err) {
+        console.warn('Error al eliminar justificante en Supabase:', err);
+      }
+    }
   };
 
   // Drag handlings
@@ -143,7 +187,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
     }
   };
 
-  const handleSubmitJustificante = (e: React.FormEvent) => {
+  const handleSubmitJustificante = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorStatus('');
     setSuccess('');
@@ -170,6 +214,25 @@ export default function CuentaTab({ user }: CuentaTabProps) {
       estado: 'PENDIENTE'
     };
 
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('justificantes').upsert({
+          id: newDoc.id,
+          usuario_id: user.id,
+          tipo: newDoc.tipo,
+          fecha_inicio: newDoc.fechaInicio,
+          fecha_fin: newDoc.fechaFin,
+          motivo: newDoc.motivo,
+          file_name: newDoc.fileName,
+          file_size: newDoc.fileSize,
+          upload_date: newDoc.uploadDate,
+          estado: newDoc.estado
+        });
+      } catch (err: any) {
+        console.warn('Fallo al subir justificante a Supabase:', err.message);
+      }
+    }
+
     const updated = [newDoc, ...docs];
     saveDocsToLocalStorage(updated);
 
@@ -184,7 +247,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
   const handleDeleteDoc = (id: string) => {
     if (window.confirm('¿Quieres retirar esta justificación del sistema?')) {
       const updated = docs.filter(d => d.id !== id);
-      saveDocsToLocalStorage(updated);
+      saveDocsToLocalStorage(updated, id);
     }
   };
 

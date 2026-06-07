@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Obra, InventarioItem, Usuario } from '../types';
+import { supabase, isSupabaseConfigured } from '../config/supabaseClient';
 import { Warehouse, Briefcase, Cpu, FileText, ArrowRightLeft, Plus, Trash2, Camera, ShieldAlert, Sparkles, Check, CheckCircle2, Import, Search, Phone, User } from 'lucide-react';
 
 interface AlbaratTemplate {
@@ -76,6 +77,7 @@ export default function AlmacenesTab() {
   const [scannedAlbaran, setScannedAlbaran] = useState<AlbaratTemplate | null>(null);
   const [ocrScannerText, setOcrScannerText] = useState('Esperando documento...');
   const [mockFileName, setMockFileName] = useState('');
+  const [capturedImg, setCapturedImg] = useState<string | null>(null);
 
   // Global notifications
   const [bannerSuccess, setBannerSuccess] = useState('');
@@ -175,50 +177,159 @@ export default function AlmacenesTab() {
       setTransfDestObraId(oList[0].id);
     }
 
-    // 2. Load Central Warehouse stock
-    const savedCentral = localStorage.getItem('aj_stock_central');
-    if (savedCentral) {
-      try { setCentralStock(JSON.parse(savedCentral)); } catch {}
-    } else {
-      const initialCentral: InventarioItem[] = [
-        { id: 'i-1', articulo: 'Saco Cemento Gris Portland 25kg', cantidad: 120, unidad: 'sacos' },
-        { id: 'i-2', articulo: 'Placa Pladur Knauf Standard 120x250', cantidad: 85, unidad: 'placas' },
-        { id: 'i-3', articulo: 'Pasta de Juntas Pladur Sacos 20kg', cantidad: 32, unidad: 'sacos' },
-        { id: 'i-4', articulo: 'Cable Cobre Libre Halógenos 1.5mm Verde/Amarillo 100m', cantidad: 12, unidad: 'bobinas' },
-        { id: 'i-5', articulo: 'Porcelánico Estepa Gris 60x60 (Caja 1.44m2)', cantidad: 40, unidad: 'cajas' },
-        { id: 'i-6', articulo: 'Tubo Multicapa Fontanería Aislado 20mm 50m', cantidad: 8, unidad: 'rollos' }
-      ];
-      setCentralStock(initialCentral);
-      localStorage.setItem('aj_stock_central', JSON.stringify(initialCentral));
-    }
+    // Load entire inventory from Supabase if active
+    const loadData = async () => {
+      let isLoadedFromSupabase = false;
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await supabase.from('inventario').select('*');
+          if (!error && data && data.length > 0) {
+            const central: InventarioItem[] = data
+              .filter((x: any) => x.obra_id === null)
+              .map((x: any) => ({
+                id: x.id,
+                articulo: x.articulo,
+                cantidad: Number(x.cantidad),
+                unidad: x.unidad
+              }));
+            
+            const virtuals: { [obraId: string]: InventarioItem[] } = {};
+            data
+              .filter((x: any) => x.obra_id !== null)
+              .forEach((x: any) => {
+                if (!virtuals[x.obra_id]) {
+                  virtuals[x.obra_id] = [];
+                }
+                virtuals[x.obra_id].push({
+                  id: x.id,
+                  articulo: x.articulo,
+                  cantidad: Number(x.cantidad),
+                  unidad: x.unidad
+                });
+              });
+            
+            setCentralStock(central);
+            setVirtualStocks(virtuals);
+            localStorage.setItem('aj_stock_central', JSON.stringify(central));
+            localStorage.setItem('aj_stock_virtuales', JSON.stringify(virtuals));
+            isLoadedFromSupabase = true;
+          }
+        } catch (err) {
+          console.warn('Fallo al cargar inventario de Supabase:', err);
+        }
+      }
 
-    // 3. Load Virtual warehouses stocks
-    const savedVirtual = localStorage.getItem('aj_stock_virtuales');
-    if (savedVirtual) {
-      try { setVirtualStocks(JSON.parse(savedVirtual)); } catch {}
-    } else {
-      const initialVirtuals: { [obraId: string]: InventarioItem[] } = {
-        'o-1': [
-          { id: 'v-1', articulo: 'Placa Pladur Knauf Standard 120x250', cantidad: 20, unidad: 'placas' },
-          { id: 'v-2', articulo: 'Saco Adhesivo Porcelánico C2TES1 25kg', cantidad: 15, unidad: 'sacos' }
-        ],
-        'o-2': [
-          { id: 'v-3', articulo: 'Split Aire Acondicionado Fujitsu Inverter', cantidad: 2, unidad: 'unidades' }
-        ]
-      };
-      setVirtualStocks(initialVirtuals);
-      localStorage.setItem('aj_stock_virtuales', JSON.stringify(initialVirtuals));
-    }
+      if (!isLoadedFromSupabase) {
+        // 2. Load Central Warehouse stock
+        const savedCentral = localStorage.getItem('aj_stock_central');
+        if (savedCentral) {
+          try { setCentralStock(JSON.parse(savedCentral)); } catch {}
+        } else {
+          const initialCentral: InventarioItem[] = [
+            { id: 'i-1', articulo: 'Saco Cemento Gris Portland 25kg', cantidad: 120, unidad: 'sacos' },
+            { id: 'i-2', articulo: 'Placa Pladur Knauf Standard 120x250', cantidad: 85, unidad: 'placas' },
+            { id: 'i-3', articulo: 'Pasta de Juntas Pladur Sacos 20kg', cantidad: 32, unidad: 'sacos' },
+            { id: 'i-4', articulo: 'Cable Cobre Libre Halógenos 1.5mm Verde/Amarillo 100m', cantidad: 12, unidad: 'bobinas' },
+            { id: 'i-5', articulo: 'Porcelánico Estepa Gris 60x60 (Caja 1.44m2)', cantidad: 40, unidad: 'cajas' },
+            { id: 'i-6', articulo: 'Tubo Multicapa Fontanería Aislado 20mm 50m', cantidad: 8, unidad: 'rollos' }
+          ];
+          setCentralStock(initialCentral);
+          localStorage.setItem('aj_stock_central', JSON.stringify(initialCentral));
+        }
+
+        // 3. Load Virtual warehouses stocks
+        const savedVirtual = localStorage.getItem('aj_stock_virtuales');
+        if (savedVirtual) {
+          try { setVirtualStocks(JSON.parse(savedVirtual)); } catch {}
+        } else {
+          const initialVirtuals: { [obraId: string]: InventarioItem[] } = {
+            'o-1': [
+              { id: 'v-1', articulo: 'Placa Pladur Knauf Standard 120x250', cantidad: 20, unidad: 'placas' },
+              { id: 'v-2', articulo: 'Saco Adhesivo Porcelánico C2TES1 25kg', cantidad: 15, unidad: 'sacos' }
+            ],
+            'o-2': [
+              { id: 'v-3', articulo: 'Split Aire Acondicionado Fujitsu Inverter', cantidad: 2, unidad: 'unidades' }
+            ]
+          };
+          setVirtualStocks(initialVirtuals);
+          localStorage.setItem('aj_stock_virtuales', JSON.stringify(initialVirtuals));
+        }
+      }
+    };
+    loadData();
   }, []);
 
-  const saveCentralToStorage = (updated: InventarioItem[]) => {
+  const saveCentralToStorage = async (updated: InventarioItem[]) => {
+    const previousIds = centralStock.map(p => p.id);
+    const updatedIds = updated.map(u => u.id);
+    const deletedIds = previousIds.filter(id => !updatedIds.includes(id));
+
     setCentralStock(updated);
     localStorage.setItem('aj_stock_central', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        if (deletedIds.length > 0) {
+          await supabase.from('inventario').delete().in('id', deletedIds);
+        }
+        if (updated.length > 0) {
+          const dbItems = updated.map(item => ({
+            id: item.id,
+            articulo: item.articulo,
+            cantidad: item.cantidad,
+            unidad: item.unidad,
+            obra_id: null
+          }));
+          await supabase.from('inventario').upsert(dbItems);
+        }
+      } catch (err) {
+        console.warn('Error al guardar central stock en Supabase:', err);
+      }
+    }
   };
 
-  const saveVirtualToStorage = (updated: { [obraId: string]: InventarioItem[] }) => {
+  const saveVirtualToStorage = async (updated: { [obraId: string]: InventarioItem[] }) => {
+    const previousIds: string[] = [];
+    Object.keys(virtualStocks).forEach(obraId => {
+      (virtualStocks[obraId] || []).forEach(item => previousIds.push(item.id));
+    });
+
+    const updatedIds: string[] = [];
+    Object.keys(updated).forEach(obraId => {
+      (updated[obraId] || []).forEach(item => updatedIds.push(item.id));
+    });
+
+    const deletedIds = previousIds.filter(id => !updatedIds.includes(id));
+
     setVirtualStocks(updated);
     localStorage.setItem('aj_stock_virtuales', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        if (deletedIds.length > 0) {
+          await supabase.from('inventario').delete().in('id', deletedIds);
+        }
+        
+        const dbItems: any[] = [];
+        Object.keys(updated).forEach(obraId => {
+          (updated[obraId] || []).forEach(item => {
+            dbItems.push({
+              id: item.id,
+              articulo: item.articulo,
+              cantidad: item.cantidad,
+              unidad: item.unidad,
+              obra_id: obraId
+            });
+          });
+        });
+        
+        if (dbItems.length > 0) {
+          await supabase.from('inventario').upsert(dbItems);
+        }
+      } catch (err) {
+        console.warn('Error al guardar virtual stocks en Supabase:', err);
+      }
+    }
   };
 
   // Add Item to Central manually
@@ -336,6 +447,7 @@ export default function AlmacenesTab() {
 
   // OCR Recognition flow simulator
   const handleOcrTemplateSelect = (template: AlbaratTemplate) => {
+    setCapturedImg(null); // Reset custom photo since template was chosen
     setIsScanning(true);
     setOcrSuccess(false);
     setScannedAlbaran(null);
@@ -369,13 +481,77 @@ export default function AlmacenesTab() {
     setDragActive(false);
   };
 
+  const handleOcrFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setMockFileName(file.name);
+      
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        setCapturedImg(previewUrl);
+      } catch (err) {
+        console.warn('Fallo al crear URL de vista previa:', err);
+      }
+
+      const randomT = ALBARANES_TEMPLATES[Math.floor(Math.random() * ALBARANES_TEMPLATES.length)];
+      
+      setIsScanning(true);
+      setOcrSuccess(false);
+      setScannedAlbaran(null);
+      setOcrScannerText('Estableciendo conexión y procesando metadatos de captura...');
+
+      setTimeout(() => {
+        setOcrScannerText(`Cargando foto en el motor OCR: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
+      }, 900);
+
+      setTimeout(() => {
+        setOcrScannerText(`Extrayendo artículos de albarán... Obteniendo correspondencia para: ${randomT.empresa}`);
+      }, 1900);
+
+      setTimeout(() => {
+        setIsScanning(false);
+        setOcrSuccess(true);
+        setScannedAlbaran(randomT);
+        setOcrScannerText('Lectura OCR de fotografía completada de forma óptima.');
+      }, 3000);
+    }
+  };
+
   const handleDropOcrFile = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      // Choose random template for mock scan when custom file dropped
+      const file = e.dataTransfer.files[0];
+      setMockFileName(file.name);
+      
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        setCapturedImg(previewUrl);
+      } catch (err) {
+        console.warn('Fallo al crear URL de vista previa:', err);
+      }
+
       const randomT = ALBARANES_TEMPLATES[Math.floor(Math.random() * ALBARANES_TEMPLATES.length)];
-      handleOcrTemplateSelect(randomT);
+      
+      setIsScanning(true);
+      setOcrSuccess(false);
+      setScannedAlbaran(null);
+      setOcrScannerText('Procesando archivo soltado...');
+
+      setTimeout(() => {
+        setOcrScannerText(`Examinando archivo: ${file.name}...`);
+      }, 900);
+
+      setTimeout(() => {
+        setOcrScannerText(`Analizando bloques de texto estructurados...`);
+      }, 1900);
+
+      setTimeout(() => {
+        setIsScanning(false);
+        setOcrSuccess(true);
+        setScannedAlbaran(randomT);
+        setOcrScannerText('Análisis OCR de archivo arrastrado finalizado.');
+      }, 3000);
     }
   };
 
@@ -876,20 +1052,42 @@ export default function AlmacenesTab() {
                 ))}
               </div>
 
-              {/* Simulated Drag zone */}
+              {/* Invisible file input or native mobile camera capturer */}
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                id="ocr-camera-input"
+                className="hidden"
+                onChange={handleOcrFileSelected}
+              />
+
+              {/* Simulated Drag zone linked to camera upload */}
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDropOcrFile}
-                className={`border-2 border-dashed rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all ${
+                onClick={() => document.getElementById('ocr-camera-input')?.click()}
+                className={`border-2 border-dashed rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
                   dragActive ? 'border-emerald-500 bg-emerald-50/10' : 'border-gray-200 hover:bg-slate-50'
                 }`}
               >
                 <Camera className="w-6 h-6 text-emerald-600/75 mb-1 animate-pulse" />
                 <span className="text-[10px] text-gray-550 leading-relaxed">
-                  <strong>Arrastra un ticket real</strong> para comprobar el OCR
+                  <strong>Haz foto o arrastra aquí</strong> para comprobar el OCR
                 </span>
+                <span className="text-[8px] text-emerald-600 font-mono mt-0.5 font-bold uppercase bg-emerald-50 px-1 rounded">Suma albarán en campo</span>
               </div>
+
+              <button
+                type="button"
+                onClick={() => document.getElementById('ocr-camera-input')?.click()}
+                className="w-full mt-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold font-mono text-[10px] uppercase rounded-xl tracking-wider shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer leading-none"
+                title="Hacer foto con el móvil para escanear"
+              >
+                <Camera className="w-4 h-4 text-emerald-200" />
+                Hacer Foto / Subir Imagen
+              </button>
             </div>
 
             {/* Lector feed monitor dashboard panel (column span: 7) */}
@@ -897,7 +1095,7 @@ export default function AlmacenesTab() {
               
               {/* Scan laser overlay line simulator */}
               {isScanning && (
-                <div className="absolute left-0 w-full h-1.5 bg-emerald-400 shadow-[0_0_15px_#10b981] animate-bounce" style={{ top: '20%' }}></div>
+                <div className="absolute left-0 w-full h-1.5 bg-emerald-400 shadow-[0_0_15px_#10b981] animate-bounce z-20" style={{ top: '35%' }}></div>
               )}
 
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
@@ -910,6 +1108,18 @@ export default function AlmacenesTab() {
 
               {/* Console log dynamic output container */}
               <div className="flex-1 flex flex-col gap-1 text-[11px] leading-relaxed select-text font-mono text-slate-350 min-h-[140px]">
+                {capturedImg && (
+                  <div className="mb-2 p-1 bg-slate-800 rounded-xl inline-block self-start border border-slate-700 relative overflow-hidden max-w-[140px] shadow-sm">
+                    <img
+                      src={capturedImg}
+                      alt="Captura Albarán"
+                      className="h-20 w-auto object-contain rounded-lg"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="text-[8px] text-gray-400 mt-1 text-center font-mono truncate">{mockFileName || 'foto_albaran.jpg'}</div>
+                  </div>
+                )}
+                
                 <div className="text-slate-500">&gt; console.ready: OCR_CONTROLLER_INITIALIZED</div>
                 
                 {isScanning ? (
@@ -930,7 +1140,7 @@ export default function AlmacenesTab() {
                   </div>
                 ) : (
                   <div className="text-slate-500 py-10 text-center text-[10px]">
-                    Selecciona una plantilla de albarán o arrastra un archivo para iniciar la lectura. El motor de procesamiento extraerá el desglose en 3 segundos.
+                    Selecciona una plantilla de albarán, toma una foto o arrastra un archivo de imagen para iniciar la lectura. El motor de extracción completará el desglose automáticamente.
                   </div>
                 )}
               </div>

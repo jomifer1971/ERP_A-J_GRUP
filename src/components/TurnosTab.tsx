@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, HardHat, FileCheck, Plus, Trash2, Check, Landmark, Users } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../config/supabaseClient';
 
 interface Turno {
   id: string;
@@ -37,48 +38,136 @@ export default function TurnosTab() {
   const [festivoDesc, setFestivoDesc] = useState('');
 
   const [notif, setNotif] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Initial Seed for work shifts and holidays to Catalan building framework
   useEffect(() => {
-    const savedTurnos = localStorage.getItem('aj_turnos');
-    const savedFestivos = localStorage.getItem('aj_festivos');
+    const loadData = async () => {
+      let isTurnosLoadedFromSupabase = false;
+      let isFestivosLoadedFromSupabase = false;
 
-    if (savedTurnos) {
-      try { setTurnos(JSON.parse(savedTurnos)); } catch {}
-    } else {
-      const defaultTurnos: Turno[] = [
-        { id: 't-1', nombre: 'Turno Estándar de Obra (Partido)', horaInicio: '08:00', horaFin: '17:00', diasLaborables: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'], descripcion: 'Jornada estándar con corte de 1h para comer.' },
-        { id: 't-2', nombre: 'Turno Intensivo de Verano', horaInicio: '07:00', horaFin: '15:00', diasLaborables: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'], descripcion: 'Evita las horas de extremo calor en cubiertas y fachadas.' },
-        { id: 't-3', nombre: 'Turno Especial Sábados Urgentes', horaInicio: '08:00', horaFin: '14:00', diasLaborables: ['Sábado'], descripcion: 'Turnos extraordinarios autorizados para cierres de local.' }
-      ];
-      setTurnos(defaultTurnos);
-      localStorage.setItem('aj_turnos', JSON.stringify(defaultTurnos));
-    }
+      if (isSupabaseConfigured) {
+        setIsSyncing(true);
+        try {
+          // Fetch Turnos from Supabase
+          const { data: turnosData, error: turnosErr } = await supabase.from('turnos').select('*');
+          if (!turnosErr && turnosData && turnosData.length > 0) {
+            const mappedTurnos: Turno[] = turnosData.map((t: any) => ({
+              id: t.id,
+              nombre: t.nombre,
+              horaInicio: t.hora_inicio,
+              horaFin: t.hora_fin,
+              diasLaborables: t.dias_laborables || [],
+              descripcion: t.descripcion || ''
+            }));
+            setTurnos(mappedTurnos);
+            localStorage.setItem('aj_turnos', JSON.stringify(mappedTurnos));
+            isTurnosLoadedFromSupabase = true;
+          }
 
-    if (savedFestivos) {
-      try { setFestivos(JSON.parse(savedFestivos)); } catch {}
-    } else {
-      const defaultFestivos: Festivo[] = [
-        { id: 'f-1', fecha: '2026-01-01', descripcion: 'Año Nuevo' },
-        { id: 'f-2', fecha: '2026-04-03', descripcion: 'Viernes Santo' },
-        { id: 'f-3', fecha: '2026-05-01', descripcion: 'Fiesta del Trabajo' },
-        { id: 'f-4', fecha: '2026-06-24', descripcion: 'San Juan (Catalunya)' },
-        { id: 'f-5', fecha: '2026-09-11', descripcion: 'Diada Nacional de Catalunya' },
-        { id: 'f-6', fecha: '2026-12-25', descripcion: 'Navidad' }
-      ];
-      setFestivos(defaultFestivos);
-      localStorage.setItem('aj_festivos', JSON.stringify(defaultFestivos));
-    }
+          // Fetch Festivos from Supabase
+          const { data: festivosData, error: festivosErr } = await supabase.from('festivos').select('*').order('fecha', { ascending: true });
+          if (!festivosErr && festivosData && festivosData.length > 0) {
+            const mappedFestivos: Festivo[] = festivosData.map((f: any) => ({
+              id: f.id,
+              fecha: f.fecha,
+              descripcion: f.descripcion
+            }));
+            setFestivos(mappedFestivos);
+            localStorage.setItem('aj_festivos', JSON.stringify(mappedFestivos));
+            isFestivosLoadedFromSupabase = true;
+          }
+        } catch (err) {
+          console.warn('Fallo al cargar planificación desde Supabase, usando local:', err);
+        } finally {
+          setIsSyncing(false);
+        }
+      }
+
+      if (!isTurnosLoadedFromSupabase) {
+        const savedTurnos = localStorage.getItem('aj_turnos');
+        if (savedTurnos) {
+          try { setTurnos(JSON.parse(savedTurnos)); } catch {}
+        } else {
+          const defaultTurnos: Turno[] = [
+            { id: 't-1', nombre: 'Turno Estándar de Obra (Partido)', horaInicio: '08:00', horaFin: '17:00', diasLaborables: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'], descripcion: 'Jornada estándar con corte de 1h para comer.' },
+            { id: 't-2', nombre: 'Turno Intensivo de Verano', horaInicio: '07:00', horaFin: '15:00', diasLaborables: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'], descripcion: 'Evita las horas de extremo calor en cubiertas y fachadas.' },
+            { id: 't-3', nombre: 'Turno Especial Sábados Urgentes', horaInicio: '08:00', horaFin: '14:00', diasLaborables: ['Sábado'], descripcion: 'Turnos extraordinarios autorizados para cierres de local.' }
+          ];
+          setTurnos(defaultTurnos);
+          localStorage.setItem('aj_turnos', JSON.stringify(defaultTurnos));
+        }
+      }
+
+      if (!isFestivosLoadedFromSupabase) {
+        const savedFestivos = localStorage.getItem('aj_festivos');
+        if (savedFestivos) {
+          try { setFestivos(JSON.parse(savedFestivos)); } catch {}
+        } else {
+          const defaultFestivos: Festivo[] = [
+            { id: 'f-1', fecha: '2026-01-01', descripcion: 'Año Nuevo' },
+            { id: 'f-2', fecha: '2026-04-03', descripcion: 'Viernes Santo' },
+            { id: 'f-3', fecha: '2026-05-01', descripcion: 'Fiesta del Trabajo' },
+            { id: 'f-4', fecha: '2026-06-24', descripcion: 'San Juan (Catalunya)' },
+            { id: 'f-5', fecha: '2026-09-11', descripcion: 'Diada Nacional de Catalunya' },
+            { id: 'f-6', fecha: '2026-12-25', descripcion: 'Navidad' }
+          ];
+          setFestivos(defaultFestivos);
+          localStorage.setItem('aj_festivos', JSON.stringify(defaultFestivos));
+        }
+      }
+    };
+
+    loadData();
   }, []);
 
-  const saveTurnos = (updated: Turno[]) => {
+  const saveTurnos = async (updated: Turno[], deletedId?: string) => {
     setTurnos(updated);
     localStorage.setItem('aj_turnos', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        if (deletedId) {
+          await supabase.from('turnos').delete().eq('id', deletedId);
+        }
+        if (updated.length > 0) {
+          const dbTurnos = updated.map(t => ({
+            id: t.id,
+            nombre: t.nombre,
+            hora_inicio: t.horaInicio,
+            hora_fin: t.horaFin,
+            dias_laborables: t.diasLaborables,
+            descripcion: t.descripcion
+          }));
+          await supabase.from('turnos').upsert(dbTurnos);
+        }
+      } catch (err) {
+        console.warn('Error al sincronizar turnos con Supabase:', err);
+      }
+    }
   };
 
-  const saveFestivos = (updated: Festivo[]) => {
+  const saveFestivos = async (updated: Festivo[], deletedId?: string) => {
     setFestivos(updated);
     localStorage.setItem('aj_festivos', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      try {
+        if (deletedId) {
+          await supabase.from('festivos').delete().eq('id', deletedId);
+        }
+        if (updated.length > 0) {
+          const dbFestivos = updated.map(f => ({
+            id: f.id,
+            fecha: f.fecha,
+            descripcion: f.descripcion
+          }));
+          await supabase.from('festivos').upsert(dbFestivos);
+        }
+      } catch (err) {
+        console.warn('Error al sincronizar festivos con Supabase:', err);
+      }
+    }
   };
 
   const handleAddTurno = (e: React.FormEvent) => {
@@ -106,7 +195,7 @@ export default function TurnosTab() {
   const handleDeleteTurno = (id: string) => {
     if (window.confirm('¿Seguro que deseas eliminar este turno de trabajo?')) {
       const updated = turnos.filter(t => t.id !== id);
-      saveTurnos(updated);
+      saveTurnos(updated, id);
       triggerNotif('Turno eliminado.');
     }
   };
@@ -131,7 +220,7 @@ export default function TurnosTab() {
 
   const handleDeleteFestivo = (id: string) => {
     const updated = festivos.filter(f => f.id !== id);
-    saveFestivos(updated);
+    saveFestivos(updated, id);
     triggerNotif('Festivo retirado.');
   };
 
