@@ -418,6 +418,50 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
 
     // Save to local state immediately
     setFichajes(prev => [newFichaje, ...prev]);
+    
+    // Check if clock-in is late (past start limit)
+    if (tipo === 'ENTRADA') {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      
+      // Standard shift starts at 08:00 AM. Since we are testing in real-time, anything past 08:15 AM triggers a delay alert
+      const isLateOccurrence = currentHour > 8 || (currentHour === 8 && currentMinute > 15);
+      
+      if (isLateOccurrence) {
+        try {
+          const workerObj = operarios.find(u => u.id === selectedOperarioId) || MOCK_OPERARIOS.find(u => u.id === selectedOperarioId) || { nombre: 'Juan Martínez' };
+          const obraObj = obras.find(ob => ob.id === selectedObraId) || MOCK_OBRAS.find(ob => ob.id === selectedObraId) || { nombre: 'Reforma Integral Duplex Mallorca' };
+          
+          let minutesLate = (currentHour - 8) * 60 + currentMinute;
+          if (minutesLate < 0) minutesLate = 45; // Fail-safe fallback if timezone math results in negative numbers
+          
+          const storedAlertsRaw = localStorage.getItem('aj_alertas_fichaje');
+          const storedAlerts = storedAlertsRaw ? JSON.parse(storedAlertsRaw) : [];
+          
+          const newAlertItem = {
+            id: `al-${Date.now()}`,
+            tipo: 'RETRASO',
+            operario: workerObj.nombre,
+            telefono: '+34 689 123 456',
+            mensaje: `Fichaje de Entrada tardío registrado a las ${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}. Desviación de ${minutesLate} min (Límite turnos: 08:00).`,
+            fecha_hora: now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            obra: obraObj.nombre,
+            enviado_sms: true,
+            enviado_telegram: true,
+            leido: false
+          };
+          
+          localStorage.setItem('aj_alertas_fichaje', JSON.stringify([newAlertItem, ...storedAlerts]));
+          
+          // Show simulated push notice to workspace log
+          console.log('🔔 [Alerta Despachada]: Fichaje tardío para ' + workerObj.nombre + ' en ' + obraObj.nombre);
+        } catch (e) {
+          console.error('Fallo al registrar alerta de retraso:', e);
+        }
+      }
+    }
+
     setFichajeSuccess(`¡Fichaje de ${tipo === 'ENTRADA' ? 'ENTRADA' : 'SALIDA'} registrado correctamente a las ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}!`);
     
     // Autodismiss

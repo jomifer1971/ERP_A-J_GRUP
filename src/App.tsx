@@ -64,7 +64,7 @@ export default function App() {
     return (isMobileUA || isSmallScreen) ? 'movil' : 'pc';
   });
 
-  const [useMobileViewOnPC, setUseMobileViewOnPC] = useState<boolean>(true);
+  const [useMobileViewOnPC, setUseMobileViewOnPC] = useState<boolean>(false);
 
   // Monitor screen size dynamically for adaptiveness
   useEffect(() => {
@@ -292,7 +292,9 @@ export default function App() {
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
                       {devicePlatform === 'pc' 
-                        ? 'Detector: Estás conectado desde un ordenador de control. Hemos empaquetado la vista en un simulador móvil.'
+                        ? (useMobileViewOnPC 
+                            ? 'Detector: Estás en ordenador. Se ha seleccionado la vista simulada en móvil para pruebas.'
+                            : 'Detector: Estás conectado desde un ordenador de control. Mostrando la vista optimizada de pantalla completa para oficina.')
                         : 'Detector: Estás conectado desde un smartphone de campo en obra. El diseño se adapta de forma nativa a tu pantalla.'}
                     </p>
                   </div>

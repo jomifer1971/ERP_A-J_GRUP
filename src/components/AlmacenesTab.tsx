@@ -78,6 +78,7 @@ export default function AlmacenesTab() {
   const [ocrScannerText, setOcrScannerText] = useState('Esperando documento...');
   const [mockFileName, setMockFileName] = useState('');
   const [capturedImg, setCapturedImg] = useState<string | null>(null);
+  const [ocrImportDest, setOcrImportDest] = useState<string>('central');
 
   // Global notifications
   const [bannerSuccess, setBannerSuccess] = useState('');
@@ -1028,34 +1029,19 @@ export default function AlmacenesTab() {
           </div>
 
           <p className="text-xs text-gray-500 leading-normal">
-            No pierdas tiempo picando facturas. Sube un albarán y deja que el sistema lo escanee para añadir el material al inventario de forma automática.
+            No pierdas tiempo picando facturas. Toma una foto con el móvil o sube un documento PDF/imagen para extraer los artículos e introducirlos en stock de forma inmediata.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
             
-            {/* OCR upload and Scan templates chooser (column span: 5) */}
-            <div className="md:col-span-5 flex flex-col gap-3">
-              <span className="text-[10px] font-bold text-gray-400 font-mono uppercase tracking-wider">Pruébalo con Plantillas reales:</span>
+            {/* LEFT SIDE: SCANNING CONTROLS */}
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] font-bold text-gray-400 font-mono uppercase tracking-wider">A) ORIGEN DEL DOCUMENTO:</span>
               
-              <div className="flex flex-col gap-2">
-                {ALBARANES_TEMPLATES.map((tmpl, idx) => (
-                  <button
-                    type="button"
-                    key={idx}
-                    onClick={() => handleOcrTemplateSelect(tmpl)}
-                    disabled={isScanning}
-                    className="flex flex-col items-start gap-1 p-3 bg-slate-50 border border-slate-200 hover:border-emerald-250 rounded-2xl text-left transition-all disabled:opacity-50"
-                  >
-                    <span className="text-[10px] font-black font-mono text-[#07474e] leading-snug">{tmpl.empresa}</span>
-                    <span className="text-[9px] text-gray-400 font-mono">{tmpl.nroAlbaran} • {tmpl.items.length} artículos</span>
-                  </button>
-                ))}
-              </div>
-
               {/* Invisible file input or native mobile camera capturer */}
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,application/pdf"
                 capture="environment"
                 id="ocr-camera-input"
                 className="hidden"
@@ -1068,107 +1054,143 @@ export default function AlmacenesTab() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDropOcrFile}
                 onClick={() => document.getElementById('ocr-camera-input')?.click()}
-                className={`border-2 border-dashed rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
+                className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
                   dragActive ? 'border-emerald-500 bg-emerald-50/10' : 'border-gray-200 hover:bg-slate-50'
                 }`}
               >
-                <Camera className="w-6 h-6 text-emerald-600/75 mb-1 animate-pulse" />
-                <span className="text-[10px] text-gray-550 leading-relaxed">
-                  <strong>Haz foto o arrastra aquí</strong> para comprobar el OCR
+                <Camera className="w-8 h-8 text-emerald-600/75 mb-2 animate-pulse" />
+                <span className="text-xs text-gray-700 leading-relaxed font-bold">
+                  Haz foto con el móvil, sube un PDF o arrastra aquí
                 </span>
-                <span className="text-[8px] text-emerald-600 font-mono mt-0.5 font-bold uppercase bg-emerald-50 px-1 rounded">Suma albarán en campo</span>
+                <span className="text-[10px] text-gray-400 mt-1">El motor OCR extraerá automáticamente las líneas de material</span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => document.getElementById('ocr-camera-input')?.click()}
-                className="w-full mt-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold font-mono text-[10px] uppercase rounded-xl tracking-wider shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer leading-none"
-                title="Hacer foto con el móvil para escanear"
-              >
-                <Camera className="w-4 h-4 text-emerald-200" />
-                Hacer Foto / Subir Imagen
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('ocr-camera-input')?.click()}
+                  className="w-full py-3 bg-[#07474e] hover:bg-[#0c5962] text-white font-bold font-mono text-xs uppercase rounded-xl tracking-wider shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer leading-none"
+                  title="Hacer foto o subir PDF / Imagen"
+                >
+                  <Camera className="w-4 h-4 text-emerald-250" />
+                  Hacer Foto / Cargar Archivo
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                <span className="text-[9px] font-bold text-gray-400 font-mono uppercase tracking-wider">Plantillas rápidas para pruebas:</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mt-1">
+                  {ALBARANES_TEMPLATES.map((tmpl, idx) => (
+                    <button
+                      type="button"
+                      key={idx}
+                      onClick={() => handleOcrTemplateSelect(tmpl)}
+                      disabled={isScanning}
+                      className="flex flex-col items-start gap-1 p-2 bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/10 rounded-xl text-left transition-all disabled:opacity-50"
+                    >
+                      <span className="text-[9px] font-black font-mono text-[#07474e] truncate w-full leading-tight">{tmpl.empresa.split(/[\s,]+/)[0]}</span>
+                      <span className="text-[8px] text-gray-400 font-mono">{tmpl.items.length} art. • {tmpl.nroAlbaran.split('-').pop()}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
-            {/* Lector feed monitor dashboard panel (column span: 7) */}
-            <div className="md:col-span-7 bg-slate-900 text-slate-100 rounded-3xl p-4 font-mono select-none relative flex flex-col gap-4 overflow-hidden border border-slate-800">
-              
-              {/* Scan laser overlay line simulator */}
-              {isScanning && (
-                <div className="absolute left-0 w-full h-1.5 bg-emerald-400 shadow-[0_0_15px_#10b981] animate-bounce z-20" style={{ top: '35%' }}></div>
-              )}
+            {/* RIGHT SIDE: SCANNING RESULT & DESTINATION CHOOSE */}
+            <div className="flex flex-col gap-4 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
+              <span className="text-[10px] font-bold text-gray-400 font-mono uppercase tracking-wider">B) DETECCIÓN Y ASENTAMIENTO:</span>
 
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
-                  Lector OCR Log: ON
-                </span>
-                <span className="text-[9px] text-slate-500">v2.4-stable</span>
-              </div>
-
-              {/* Console log dynamic output container */}
-              <div className="flex-1 flex flex-col gap-1 text-[11px] leading-relaxed select-text font-mono text-slate-350 min-h-[140px]">
-                {capturedImg && (
-                  <div className="mb-2 p-1 bg-slate-800 rounded-xl inline-block self-start border border-slate-700 relative overflow-hidden max-w-[140px] shadow-sm">
-                    <img
-                      src={capturedImg}
-                      alt="Captura Albarán"
-                      className="h-20 w-auto object-contain rounded-lg"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="text-[8px] text-gray-400 mt-1 text-center font-mono truncate">{mockFileName || 'foto_albaran.jpg'}</div>
-                  </div>
-                )}
-                
-                <div className="text-slate-500">&gt; console.ready: OCR_CONTROLLER_INITIALIZED</div>
-                
-                {isScanning ? (
-                  <div className="text-amber-400 animate-pulse mt-2">{`⚡ EXTRACCIÓN EN CURSO:\n  ${ocrScannerText}`}</div>
-                ) : scannedAlbaran ? (
-                  <div className="flex flex-col gap-2 mt-1">
-                    <span className="text-emerald-400 font-extrabold">&gt; EXTRAÍDO CON ÉXITO: {scannedAlbaran.empresa}</span>
-                    <span className="text-slate-400 text-[10px]">Albarán: {scannedAlbaran.nroAlbaran} • {scannedAlbaran.fecha}</span>
-                    
-                    <div className="border-t border-slate-800 pt-1.5 mt-1 flex flex-col gap-1 text-[10px]">
-                      {scannedAlbaran.items.map((it, idx) => (
-                        <div key={idx} className="flex justify-between text-slate-300">
-                          <span>{it.articulo}</span>
-                          <span className="text-emerald-400 font-bold">{it.cantidad} {it.unidad}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-slate-500 py-10 text-center text-[10px]">
-                    Selecciona una plantilla de albarán, toma una foto o arrastra un archivo de imagen para iniciar la lectura. El motor de extracción completará el desglose automáticamente.
-                  </div>
-                )}
-              </div>
-
-              {/* Import trigger actions */}
-              {ocrSuccess && scannedAlbaran && (
-                <div className="border-t border-slate-800 pt-3 flex flex-col gap-2.5">
-                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider leading-none">¿Dónde deseas asentar este material?</span>
-                  
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleImportScannedItems('central')}
-                      className="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-650 text-slate-900 border-none font-black text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                    >
-                      <Import className="w-3 h-3" />
-                      ALMACÉN CENTRAL
-                    </button>
-                    
-                    <button
-                      onClick={() => handleImportScannedItems(selectedObraId)}
-                      className="flex-1 py-1.5 bg-[#004e56] hover:bg-[#0b5c65] text-white border-none font-black text-[10px] rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                    >
-                      <Warehouse className="w-3 h-3 text-emerald-400" />
-                      ESTA OBRA EN CURSO
-                    </button>
+              {/* Status information or extracted preview image */}
+              {capturedImg && (
+                <div className="p-2 bg-slate-50 rounded-xl flex items-center gap-3 border border-slate-150">
+                  <img
+                    src={capturedImg}
+                    alt="Miniatura Albarán"
+                    className="h-10 w-10 object-cover rounded-lg border border-slate-200 bg-white"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] font-mono text-gray-400 uppercase leading-none font-bold">Archivo cargado:</p>
+                    <p className="text-xs text-gray-700 font-bold truncate mt-0.5">{mockFileName || 'Captura_albaran.jpg'}</p>
                   </div>
                 </div>
               )}
+
+              {/* Scan loading state */}
+              {isScanning && (
+                <div className="flex-1 flex flex-col items-center justify-center py-6 text-center bg-emerald-50/20 rounded-2xl border border-emerald-100 p-4 min-h-[140px]">
+                  <div className="w-8 h-8 rounded-full border-4 border-emerald-200 border-t-emerald-600 animate-spin mb-3"></div>
+                  <p className="text-xs font-bold text-emerald-800 animate-pulse">{ocrScannerText}</p>
+                  <p className="text-[9px] text-emerald-600 mt-1 font-mono">Procesando lectura con inteligencia artificial de obra...</p>
+                </div>
+              )}
+
+              {/* Successful scan result */}
+              {!isScanning && scannedAlbaran ? (
+                <div className="flex-1 flex flex-col gap-3 p-4 bg-emerald-50/15 border border-emerald-200/50 rounded-2xl">
+                  <div className="flex items-center justify-between border-b border-emerald-100/60 pb-2">
+                    <span className="text-xs font-black text-emerald-800 uppercase tracking-tight">{scannedAlbaran.empresa}</span>
+                    <span className="text-[10px] text-emerald-600 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded">{scannedAlbaran.nroAlbaran}</span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
+                    {scannedAlbaran.items.map((it, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs text-slate-700 bg-white px-2.5 py-1.5 rounded-lg border border-slate-100">
+                        <span className="font-medium truncate mr-2">{it.articulo}</span>
+                        <span className="text-emerald-700 font-extrabold bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-mono shrink-0">
+                          +{it.cantidad} {it.unidad}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Destination warehouse selector */}
+                  <div className="mt-1 flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-gray-400 font-mono uppercase tracking-wider leading-none">Guardar material en:</label>
+                    <select
+                      value={ocrImportDest}
+                      onChange={e => setOcrImportDest(e.target.value)}
+                      className="w-full px-2.5 py-2 bg-white border border-gray-250 rounded-lg text-xs font-bold text-gray-800"
+                    >
+                      <option value="central">📦 Almacén Central de Proveedores</option>
+                      {obrasList.map(o => (
+                        <option key={o.id} value={o.id}>
+                          🏗️ Obra: {o.nombre} ({o.ubicacion})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                !isScanning && (
+                  <div className="flex-1 flex flex-col items-center justify-center p-6 text-center border border-dashed border-gray-200 rounded-2xl min-h-[140px] bg-slate-25/20">
+                    <span className="text-xs text-slate-400">Ningún albarán leído todavía</span>
+                    <span className="text-[10px] text-gray-400 max-w-[210px] mt-1 leading-relaxed">Toma una foto, sube un PDF de prueba o haz clic en una plantilla rápida para verificar la extracción de artículos.</span>
+                  </div>
+                )
+              )}
+
+              {/* ACTION TRIGGER BUTTON (The single green button requested!) */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (scannedAlbaran) {
+                    handleImportScannedItems(ocrImportDest);
+                  }
+                }}
+                disabled={!scannedAlbaran || isScanning}
+                className={`w-full py-3.5 px-4 font-black font-mono text-[11px] uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 ${
+                  scannedAlbaran && !isScanning
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer active:scale-[0.98]'
+                    : 'bg-gray-100 text-gray-400 border border-gray-200/60 cursor-not-allowed'
+                }`}
+              >
+                <div className={`w-2.5 h-2.5 rounded-full ${scannedAlbaran ? 'bg-emerald-300 animate-ping' : 'bg-gray-350 opacity-40'}`} />
+                {scannedAlbaran 
+                  ? `Confirmar e ingresar albarán en destino ✓` 
+                  : `Esperando lectura de albarán...`}
+              </button>
 
             </div>
 
