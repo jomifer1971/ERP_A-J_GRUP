@@ -9,7 +9,8 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ParteDiarioForm from './components/ParteDiarioForm';
 import Logo from './components/Logo';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Database, Wifi, WifiOff } from 'lucide-react';
+import { isSupabaseConfigured } from './config/supabaseClient';
 
 export default function App() {
   const currentYear = new Date().getFullYear();
@@ -48,6 +49,19 @@ export default function App() {
       {/* 1. MASTER RESPONSIVE HEADER */}
       <header className="h-16 bg-white border-b border-[#e2e8f0] px-4 md:px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <Logo className="h-9 md:h-11 shrink-0" />
+
+        {/* Administrator connection status badge */}
+        {isAdmin && (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] md:text-xs font-bold font-mono tracking-wide shadow-sm border bg-emerald-50 text-emerald-800 border-emerald-200">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <Database className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="hidden xs:inline">ADMIN: COPIAS EN LÍNEA (SUPABASE)</span>
+            <span className="xs:hidden">SUPABASE EN LÍNEA</span>
+          </div>
+        )}
 
         {/* User profile actions */}
         <div className="flex items-center gap-4">

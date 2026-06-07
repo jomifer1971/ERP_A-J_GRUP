@@ -299,49 +299,6 @@ export default function ParteDiarioForm() {
   return (
     <div className="w-full max-w-md mx-auto flex flex-col gap-6" id="parte-diario-pantalla">
       
-      {/* Network & Source Integration Banner */}
-      <div className={`p-4 rounded-2xl flex items-center justify-between border transition-all duration-300 ${
-        usingSimulatedData 
-          ? 'bg-amber-50/70 border-amber-100 text-amber-900' 
-          : 'bg-emerald-50/70 border-emerald-100 text-emerald-900'
-      }`}>
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-xl flex items-center justify-center ${
-            usingSimulatedData ? 'bg-amber-100' : 'bg-emerald-100'
-          }`}>
-            {usingSimulatedData ? (
-              <WifiOff className="w-5 h-5 text-amber-600" />
-            ) : (
-              <Wifi className="w-5 h-5 text-emerald-600" />
-            )}
-          </div>
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider font-mono">
-              {usingSimulatedData ? 'Modo Local / Simulación' : 'Conectado a Supabase'}
-            </div>
-            <p className="text-[11px] opacity-80 leading-snug">
-              {usingSimulatedData 
-                ? 'Introduce tus variables de entorno para insertar datos en tiempo real.' 
-                : 'La sincronización de datos con RLS está totalmente activa.'}
-            </p>
-          </div>
-        </div>
-        
-        {isSupabaseConfigured && (
-          <button 
-            type="button"
-            onClick={() => setUsingSimulatedData(p => !p)}
-            className={`px-2.5 py-1 text-[10px] font-mono font-medium rounded-lg border transition-all uppercase ${
-              usingSimulatedData 
-                ? 'bg-white border-amber-200 text-amber-700 hover:bg-amber-100' 
-                : 'bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-            }`}
-          >
-            Configurar
-          </button>
-        )}
-      </div>
-
       {/* Main Card */}
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden" id="card-parte-diario">
         <div className="bg-[#07474e] p-6 text-white relative">
@@ -350,9 +307,19 @@ export default function ParteDiarioForm() {
             <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md">
               <ClipboardList className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">Parte Diario de Trabajo</h2>
-              <p className="text-xs text-teal-100 font-mono tracking-wide uppercase mt-0.5">A&J GRUP BCN • INSTALACIONES</p>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold tracking-tight truncate">Parte Diario de Trabajo</h2>
+              <div className="flex items-center justify-between gap-2 mt-1">
+                <p className="text-xs text-teal-100 font-mono tracking-wide uppercase truncate">A&J GRUP BCN • INSTALACIONES</p>
+                <span className={`inline-flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
+                  usingSimulatedData 
+                    ? 'bg-amber-500/20 text-amber-200 border border-amber-500/30' 
+                    : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'
+                }`}>
+                  <span className={`w-1 h-1 rounded-full ${usingSimulatedData ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'}`}></span>
+                  {usingSimulatedData ? 'LOCAL' : 'REMOTO'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
