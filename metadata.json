@@ -1,6 +1,6 @@
 {
   "name": "A&J GRUP BCN",
   "description": "Aplicación web de gestión interna para empresa de reformas e instalaciones",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -14,11 +14,12 @@ interface LoginProps {
 
 // Fallback simulated users 
 const MOCK_USERS: Usuario[] = [
-  { id: 'u-1', nombre: 'Javier Domínguez', email: 'ceo@ajgrup.com', rol: 'ceo', validado: true },
-  { id: 'u-2', nombre: 'Admin Master', email: 'admin@ajgrup.com', rol: 'admin', validado: true },
-  { id: 'u-3', nombre: 'Carlos Jefe', email: 'jefe@ajgrup.com', rol: 'jefe_equipo', validado: true },
-  { id: 'u-4', nombre: 'Juan Operario', email: 'juan@ajgrup.com', rol: 'operario', validado: true },
-  { id: 'u-5', nombre: 'Nuevo Empleado', email: 'nuevo@ajgrup.com', rol: 'operario', validado: false },
+  { id: 'u-1', nombre: 'Javier Domínguez', email: 'ceo@ajgrup.com', rol: 'ceo', validado: true, especialidades: ['electricista', 'fontanero'] },
+  { id: 'u-2', nombre: 'Admin Master', email: 'admin@ajgrup.com', rol: 'admin', validado: true, especialidades: ['electricista'] },
+  { id: 'u-3', nombre: 'Carlos Jefe', email: 'jefe@ajgrup.com', rol: 'jefe_equipo', validado: true, especialidades: ['paleta', 'fontanero'] },
+  { id: 'u-4', nombre: 'Juan Operario', email: 'juan@ajgrup.com', rol: 'operario', validado: true, especialidades: ['paleta'], jefeId: 'u-3' },
+  { id: 'u-5', nombre: 'Nuevo Empleado', email: 'nuevo@ajgrup.com', rol: 'operario', validado: false, especialidades: ['pintor'] },
+  { id: 'u-jomi', nombre: 'José Miguel Domínguez', email: 'jomifer1971@gmail.com', rol: 'ceo', validado: true, especialidades: ['paleta', 'pintor', 'electricista', 'fontanero'] },
 ];
 export default function Login({ onLogin }: LoginProps) {
   const [email, setEmail] = useState('');
@@ -48,7 +49,31 @@ export default function Login({ onLogin }: LoginProps) {
     // Simulate network request
     setTimeout(() => {
       setLoading(false);
-      const user = MOCK_USERS.find(u => u.email === email.trim().toLowerCase() && password === '123456');
+      
+      let systemUsers = MOCK_USERS;
+      const saved = localStorage.getItem('aj_users_v2');
+      if (saved) {
+        try {
+          systemUsers = JSON.parse(saved);
+        } catch {}
+      } else {
+        localStorage.setItem('aj_users_v2', JSON.stringify(MOCK_USERS));
+      }
+
+      let user = systemUsers.find(u => u.email === email.trim().toLowerCase() && password === '123456');
+      if (!user && password === '123456') {
+        const newUser: Usuario = {
+          id: `u-${Date.now()}`,
+          nombre: email.trim().split('@')[0],
+          email: email.trim().toLowerCase(),
+          rol: 'ceo',
+          validado: true
+        };
+        systemUsers.push(newUser);
+        localStorage.setItem('aj_users_v2', JSON.stringify(systemUsers));
+        user = newUser;
+      }
+      
       if (user) {
         if (!user.validado) {
           setError('Tu cuenta aún está pendiente de validación por parte del administrador.');

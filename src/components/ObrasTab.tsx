@@ -18,7 +18,11 @@ import {
   Building,
   Sparkles,
   RefreshCw,
-  FolderOpen
+  FolderOpen,
+  Compass,
+  Locate,
+  Shield,
+  ShieldCheck
 } from 'lucide-react';
 
 interface ObrasTabProps {
@@ -39,19 +43,19 @@ interface DocumentoObra {
   fileData?: string; // Data URL for downloading
 }
 
-// Catalan Municipal Seed Directory for immediate autocompletion
+// Catalan Municipal Seed Directory for immediate autocompletion with coordinates
 const CATALAN_PRESET_STREETS = [
-  { calle: 'Carrer del Consell de Cent, Barcelona', ciudad: 'Barcelona' },
-  { calle: 'Avinguda Diagonal, 450, Barcelona', ciudad: 'Barcelona' },
-  { calle: 'La Rambla, 120, Barcelona', ciudad: 'Barcelona' },
-  { calle: 'Carrer de Girona, 32, Sabadell', ciudad: 'Sabadell' },
-  { calle: 'Avinguda de Josep Tarradellas, L\'Hospitalet de Llobregat', ciudad: 'Hospitalet' },
-  { calle: 'Carrer Major, 15, Lleida', ciudad: 'Lleida' },
-  { calle: 'Rambla Nova, 85, Tarragona', ciudad: 'Tarragona' },
-  { calle: 'Carrer de la Rutlla, 44, Girona', ciudad: 'Gironia' },
-  { calle: 'Carrer de Sant Joan, Reus', ciudad: 'Reus' },
-  { calle: 'Carrer de Guifré, Badalona', ciudad: 'Badalona' },
-  { calle: 'Avinguda de Barcelona, Terrassa', ciudad: 'Terrassa' }
+  { calle: 'Carrer del Consell de Cent, Barcelona', ciudad: 'Barcelona', lat: 41.388824, lon: 2.163212 },
+  { calle: 'Avinguda Diagonal, 450, Barcelona', ciudad: 'Barcelona', lat: 41.396112, lon: 2.152438 },
+  { calle: 'La Rambla, 120, Barcelona', ciudad: 'Barcelona', lat: 41.383182, lon: 2.171120 },
+  { calle: 'Carrer de Girona, 32, Sabadell', ciudad: 'Sabadell', lat: 41.545892, lon: 2.110292 },
+  { calle: 'Avinguda de Josep Tarradellas, L\'Hospitalet de Llobregat', ciudad: 'Hospitalet', lat: 41.361102, lon: 2.102381 },
+  { calle: 'Carrer Major, 15, Lleida', ciudad: 'Lleida', lat: 41.614917, lon: 0.626883 },
+  { calle: 'Rambla Nova, 85, Tarragona', ciudad: 'Tarragona', lat: 41.115854, lon: 1.250553 },
+  { calle: 'Carrer de la Rutlla, 44, Girona', ciudad: 'Gironona', lat: 41.979313, lon: 2.821415 },
+  { calle: 'Carrer de Sant Joan, Reus', ciudad: 'Reus', lat: 41.155551, lon: 1.107255 },
+  { calle: 'Carrer de Guifré, Badalona', ciudad: 'Badalona', lat: 41.442654, lon: 2.241512 },
+  { calle: 'Avinguda de Barcelona, Terrassa', ciudad: 'Terrassa', lat: 41.561541, lon: 2.019124 }
 ];
 
 export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
@@ -62,17 +66,45 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
     const saved = localStorage.getItem('aj_obras_v2');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved) as Obra[];
+        return parsed.map((o: Obra) => {
+          const updated = { ...o };
+          if (updated.geovalla_activa === undefined) {
+            updated.geovalla_activa = o.id === 'o-1' || o.id === 'o-2';
+          }
+          if (!updated.radio) {
+            updated.radio = o.id === 'o-2' ? 100 : 150;
+          }
+          if (!updated.latitud || !updated.longitud) {
+            if (o.id === 'o-1') {
+              updated.latitud = 41.390035;
+              updated.longitud = 2.158145;
+            } else if (o.id === 'o-2') {
+              updated.latitud = 41.404285;
+              updated.longitud = 2.157143;
+            } else if (o.id === 'o-3') {
+              updated.latitud = 41.401138;
+              updated.longitud = 2.198357;
+            } else if (o.id === 'o-4') {
+              updated.latitud = 41.383122;
+              updated.longitud = 2.161092;
+            } else {
+              updated.latitud = 41.385063;
+              updated.longitud = 2.173403;
+            }
+          }
+          return updated;
+        });
       } catch {
         return [];
       }
     }
-    // Default initial seed
+    // Default initial seed with geovalla active and GPS positions
     const defaultObras: Obra[] = [
-      { id: 'o-1', nombre: 'Reforma Integral Duplex Mallorca', direccion: 'Carrer de Mallorca, 142, BCN', estado: 'EN_CURSO' },
-      { id: 'o-2', nombre: 'Instalación Climatización Oficinas Gràcia', direccion: 'Carrer de Verdi, 88, BCN', estado: 'EN_CURSO' },
-      { id: 'o-3', nombre: 'Instalación Eléctrica Nave Poblenou', direccion: 'Carrer de Pallars, 201, BCN', estado: 'EN_CURSO' },
-      { id: 'o-4', nombre: 'Pintura y Suelos Consultorio Médico', direccion: 'Gran Via de les Corts Catalanes, 560, BCN', estado: 'EN_CURSO' }
+      { id: 'o-1', nombre: 'Reforma Integral Duplex Mallorca', direccion: 'Carrer de Mallorca, 142, BCN', estado: 'EN_CURSO', geovalla_activa: true, latitud: 41.390035, longitud: 2.158145, radio: 150 },
+      { id: 'o-2', nombre: 'Instalación Climatización Oficinas Gràcia', direccion: 'Carrer de Verdi, 88, BCN', estado: 'EN_CURSO', geovalla_activa: true, latitud: 41.404285, longitud: 2.157143, radio: 100 },
+      { id: 'o-3', nombre: 'Instalación Eléctrica Nave Poblenou', direccion: 'Carrer de Pallars, 201, BCN', estado: 'EN_CURSO', geovalla_activa: false, latitud: 41.401138, longitud: 2.198357, radio: 200 },
+      { id: 'o-4', nombre: 'Pintura y Suelos Consultorio Médico', direccion: 'Gran Via de les Corts Catalanes, 560, BCN', estado: 'EN_CURSO', geovalla_activa: false, latitud: 41.383122, longitud: 2.161092, radio: 150 }
     ];
     localStorage.setItem('aj_obras_v2', JSON.stringify(defaultObras));
     return defaultObras;
@@ -83,7 +115,8 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
 
   // 2. Catalan Street Autocomplete State
   const [addressQuery, setAddressQuery] = useState('');
-  const [addressSuggestions, setAddressSuggestions] = useState<Array<{ display_name: string }>>([]);
+  const [addressSuggestions, setAddressSuggestions] = useState<Array<{ display_name: string; lat?: number; lon?: number }>>([]);
+  const [selectedCoords, setSelectedCoords] = useState<{ lat?: number; lon?: number }>({});
   const [isSearchingAddress, setIsSearchingAddress] = useState(false);
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
 
@@ -142,6 +175,25 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
     return initialDocs;
   });
 
+  // Geovalla editor state local to selected obra
+  const [editGeovallaActiva, setEditGeovallaActiva] = useState(false);
+  const [editLat, setEditLat] = useState(41.385063);
+  const [editLon, setEditLon] = useState(2.173403);
+  const [editRadio, setEditRadio] = useState(150);
+  const [geovallaSuccess, setGeovallaSuccess] = useState(false);
+  const [geovallaGpsLoading, setGeovallaGpsLoading] = useState(false);
+
+  // Sync geovalla values when selection changes
+  useEffect(() => {
+    const currentObra = obras.find(o => o.id === selectedObraId);
+    if (currentObra) {
+      setEditGeovallaActiva(!!currentObra.geovalla_activa);
+      setEditLat(currentObra.latitud || 41.385063);
+      setEditLon(currentObra.longitud || 2.173403);
+      setEditRadio(currentObra.radio || 150);
+    }
+  }, [selectedObraId, obras]);
+
   const [docFilterType, setDocFilterType] = useState<string>('todos');
   const [uploadDocTipo, setUploadDocTipo] = useState<'Planos' | 'Presupuesto' | 'Contrato' | 'Seguridad' | 'Otro'>('Planos');
   const [isDraggingDoc, setIsDraggingDoc] = useState(false);
@@ -183,11 +235,11 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
 
     setShowAddressDropdown(true);
 
-    // Apply quick filtered local presets for zero-latency response
+    // Apply quick filtered local presets for zero-latency response with coords
     const localFiltered = CATALAN_PRESET_STREETS.filter(s => 
       s.calle.toLowerCase().includes(val.toLowerCase()) || 
       s.ciudad.toLowerCase().includes(val.toLowerCase())
-    ).map(s => ({ display_name: `${s.calle}, Catalunya` }));
+    ).map(s => ({ display_name: `${s.calle}, Catalunya`, lat: s.lat, lon: s.lon }));
 
     setAddressSuggestions(localFiltered);
 
@@ -203,7 +255,9 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
           const remoteData = await res.json();
           if (remoteData && remoteData.length > 0) {
             const formatted = remoteData.map((item: any) => ({
-              display_name: item.display_name
+              display_name: item.display_name,
+              lat: item.lat ? parseFloat(item.lat) : undefined,
+              lon: item.lon ? parseFloat(item.lon) : undefined
             }));
             // Merge unique local and OSM predictions
             setAddressSuggestions(prev => {
@@ -225,11 +279,12 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
     }
   };
 
-  // Select predicted address
-  const selectAddress = (addr: string) => {
+  // Select predicted address with coordinates
+  const selectAddress = (addr: string, lat?: number, lon?: number) => {
     // Simplify Catalan display coordinates from NOMINATIM for builders
     const cleaned = addr.replace(', Comunidad Autónoma de Cataluña / Catalunya, España', '').replace(', España', '');
     setAddressQuery(cleaned);
+    setSelectedCoords({ lat, lon });
     setShowAddressDropdown(false);
   };
 
@@ -252,7 +307,11 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
       id: `obra-${Date.now()}`,
       nombre: newObraNombre.trim(),
       direccion: addressQuery,
-      estado: newObraEstado
+      estado: newObraEstado,
+      geovalla_activa: false,
+      latitud: selectedCoords.lat || 41.385063, // Fallback to Barcelona Centre Catalan coordinates
+      longitud: selectedCoords.lon || 2.173403,
+      radio: 150
     };
 
     setObras(prev => [newObra, ...prev]);
@@ -262,6 +321,7 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
     setNewObraNombre('');
     setAddressQuery('');
     setNewObraEstado('EN_CURSO');
+    setSelectedCoords({});
     setFormSuccess(true);
     setTimeout(() => setFormSuccess(false), 4000);
   };
@@ -279,6 +339,53 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
         setSelectedObraId(obras[0]?.id || '');
       }
     }
+  };
+
+  // Save Geovalla configuration changes (only by CEO and Admin)
+  const handleSaveGeovalla = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedObraId) return;
+    
+    setObras(prev => prev.map(o => o.id === selectedObraId ? {
+      ...o,
+      geovalla_activa: editGeovallaActiva,
+      latitud: editLat,
+      longitud: editLon,
+      radio: editRadio
+    } : o));
+    
+    setGeovallaSuccess(true);
+    setTimeout(() => setGeovallaSuccess(false), 3000);
+  };
+
+  // Capture current browser GPS coords to set as center
+  const handleCaptureCurrentGps = () => {
+    if (!navigator.geolocation) {
+      alert('Tu navegador no soporta geolocalización o el iframe no tiene los permisos necesarios.');
+      return;
+    }
+    
+    setGeovallaGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setEditLat(parseFloat(position.coords.latitude.toFixed(6)));
+        setEditLon(parseFloat(position.coords.longitude.toFixed(6)));
+        setGeovallaGpsLoading(false);
+      },
+      (error) => {
+        setGeovallaGpsLoading(false);
+        let errorMsg = 'No se pudo obtener tu ubicación.';
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMsg = 'Permiso de geolocalización denegado. Permite el acceso GPS en la barra del navegador de tu teléfono o PC.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMsg = 'La información del GPS no está disponible en este momento.';
+        } else if (error.code === error.TIMEOUT) {
+          errorMsg = 'Tiempo de espera agotado al obtener el GPS.';
+        }
+        alert(errorMsg);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   // Document actions
@@ -479,7 +586,7 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
                       <button
                         type="button"
                         key={idx}
-                        onClick={() => selectAddress(item.display_name)}
+                        onClick={() => selectAddress(item.display_name, item.lat, item.lon)}
                         className="w-full text-left px-3 py-2 text-[11px] hover:bg-teal-50 transition-colors flex items-start gap-1 text-gray-700 font-medium"
                       >
                         <MapPin className="w-3 h-3 text-[#07474e] mt-0.5 shrink-0" />
@@ -616,6 +723,150 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
                   </span>
                   <span className="text-[10px] text-gray-400 font-mono mt-1">Carga de planos segura</span>
                 </div>
+              </div>
+
+              {/* Geovalla de Seguridad Component */}
+              <div id="geovalla_container" className="bg-[#f8fafc] rounded-2xl border border-gray-200/90 p-4 flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-teal-50 border border-teal-100 rounded-lg text-[#07474e]">
+                      <Shield className="w-4 h-4 text-[#07474e]" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-black font-mono uppercase tracking-wide text-gray-800">Geovalla de Seguridad GPS</h3>
+                      <p className="text-[10px] text-gray-400">Control de fichajes por perímetro virtual (solo CEO/Admin).</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {currentObra.geovalla_activa ? (
+                      <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black font-mono tracking-wide bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs uppercase">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        </span>
+                        Activa ({currentObra.radio}m)
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black font-mono tracking-wide bg-gray-100 text-gray-500 border border-gray-200 uppercase">
+                        Apagada / Sin Límite
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Display Current Coordinates summary to people without role modifications */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-white px-3 py-2 rounded-xl border border-gray-150">
+                    <span className="text-[8px] font-bold text-gray-400 uppercase font-mono tracking-wider">Latitud Centro</span>
+                    <p className="text-xs font-bold text-gray-700 font-mono mt-0.5">{currentObra.latitud?.toFixed(6) || 'N/A'}</p>
+                  </div>
+                  <div className="bg-white px-3 py-2 rounded-xl border border-gray-150">
+                    <span className="text-[8px] font-bold text-gray-400 uppercase font-mono tracking-wider">Longitud Centro</span>
+                    <p className="text-xs font-bold text-gray-700 font-mono mt-0.5">{currentObra.longitud?.toFixed(6) || 'N/A'}</p>
+                  </div>
+                  <div className="bg-white px-3 py-2 rounded-xl border border-gray-150">
+                    <span className="text-[8px] font-bold text-gray-400 uppercase font-mono tracking-wider font-bold">Radio de Control</span>
+                    <p className="text-xs font-bold text-gray-700 font-mono mt-0.5">{currentObra.radio || 150} metros</p>
+                  </div>
+                </div>
+
+                {/* Editable Section ONLY for CEO/Admin */}
+                {isAdmin ? (
+                  <form onSubmit={handleSaveGeovalla} className="flex flex-col gap-3 mt-1.5 bg-white p-3 rounded-xl border border-[#e2e8f0]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black font-mono text-[#07474e] uppercase">Modo de Modificación (Panel CEO & Admin)</span>
+                      
+                      <label className="relative inline-flex items-center cursor-pointer select-none">
+                        <input 
+                          type="checkbox" 
+                          checked={editGeovallaActiva} 
+                          onChange={(e) => setEditGeovallaActiva(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#07474e]"></div>
+                        <span className="ml-2 text-[10px] font-bold font-mono text-gray-700 uppercase">
+                          {editGeovallaActiva ? 'Valla Activada' : 'Valla Desactivada'}
+                        </span>
+                      </label>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold text-gray-500 uppercase font-mono">Latitud</label>
+                        <input 
+                          type="number" 
+                          step="0.000001"
+                          value={editLat}
+                          onChange={(e) => setEditLat(parseFloat(e.target.value) || 0)}
+                          className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs font-mono"
+                          required
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold text-gray-500 uppercase font-mono">Longitud</label>
+                        <input 
+                          type="number" 
+                          step="0.000001"
+                          value={editLon}
+                          onChange={(e) => setEditLon(parseFloat(e.target.value) || 0)}
+                          className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs font-mono"
+                          required
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold text-gray-500 uppercase font-mono">Radio de Control (m)</label>
+                        <select 
+                          value={editRadio}
+                          onChange={(e) => setEditRadio(parseInt(e.target.value) || 150)}
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs font-bold font-mono text-[#07474e]"
+                        >
+                          <option value="50">50m (Muy Estricto)</option>
+                          <option value="100">100m (Estricto)</option>
+                          <option value="150">150m (Recomendado)</option>
+                          <option value="200">200m (Estándar)</option>
+                          <option value="300">300m (Amplio)</option>
+                          <option value="500">500m (Muy Amplio)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 mt-2 pt-2 border-t border-gray-100">
+                      <button
+                        type="button"
+                        onClick={handleCaptureCurrentGps}
+                        disabled={geovallaGpsLoading}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal-150 bg-teal-50/50 hover:bg-teal-50 text-[10px] text-[#07474e] font-black font-mono transition-colors disabled:opacity-50"
+                      >
+                        <Locate className={`w-3.5 h-3.5 ${geovallaGpsLoading ? 'animate-spin text-teal-600' : ''}`} />
+                        {geovallaGpsLoading ? 'CAPTURANDO GPS...' : '📍 FIJAR MI GPS ACTUAL'}
+                      </button>
+
+                      <div className="flex items-center gap-2 self-end">
+                        {geovallaSuccess && (
+                          <span className="text-[9px] font-black font-mono text-emerald-800 bg-emerald-50 border border-emerald-150 px-2 py-1 rounded-md animate-fade-in shrink-0">
+                            ¡GUARDADO CORRECTO!
+                          </span>
+                        )}
+                        <button
+                          type="submit"
+                          className="px-4 py-1.5 bg-[#07474e] hover:bg-[#07474e]/90 text-white text-[10px] font-black font-mono uppercase tracking-wider rounded-lg transition-all shadow-sm"
+                        >
+                          Guardar Geovalla
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="p-2.5 bg-amber-50/60 border border-amber-100 rounded-xl flex items-start gap-2 mt-1">
+                    <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] text-[#0f172a] leading-relaxed">
+                        🛡️ <strong>Saber más:</strong> Esta obra requiere estar físicamente dentro de su geovalla ({currentObra.radio} metros) para poder fichar tu parte de trabajo diario. Modificable solo por CEO y Administradores.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Document Repository & Tab Filters */}

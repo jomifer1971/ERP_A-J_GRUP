@@ -9,6 +9,8 @@ export interface Usuario {
   email: string;
   rol: 'ceo' | 'admin' | 'jefe_equipo' | 'operario';
   validado: boolean;
+  especialidades?: string[];
+  jefeId?: string;
 }
 
 export interface Obra {
@@ -16,6 +18,10 @@ export interface Obra {
   nombre: string;
   direccion: string;
   estado: 'EN_CURSO' | 'FINALIZADA' | 'PENDIENTE';
+  geovalla_activa?: boolean;
+  latitud?: number;
+  longitud?: number;
+  radio?: number; // Radio in meters
 }
 
 export interface InventarioItem {
@@ -35,3 +41,14 @@ export interface ParteTrabajo {
   materiales_usados?: string;
   created_at?: string;
 }
+
+export interface Fichaje {
+  id?: string;
+  operario_id: string;
+  obra_id: string;
+  tipo: 'ENTRADA' | 'SALIDA';
+  fecha_hora: string;
+  distancia_metros?: number;
+  coordenadas?: string;
+}
+
