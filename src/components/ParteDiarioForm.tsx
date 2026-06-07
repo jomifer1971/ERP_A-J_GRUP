@@ -647,7 +647,7 @@ export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
   }
 
   return (
-    <div className={`w-full ${activeSubTab === 'informe' ? 'max-w-4xl' : 'max-w-md'} mx-auto flex flex-col gap-6 transition-all duration-300`} id="parte-diario-pantalla">
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-6 transition-all duration-300" id="parte-diario-pantalla">
       
       {/* Main Card */}
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden" id="card-parte-diario">
@@ -732,154 +732,160 @@ export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
             <WeeklyClockingReport currentUser={activeUser!} />
           </div>
         ) : (
-          <form onSubmit={(e) => { e.preventDefault(); if (activeSubTab === 'parte') handleSubmit(e); }} className="p-6 flex flex-col gap-5">
+          <form onSubmit={(e) => { e.preventDefault(); if (activeSubTab === 'parte') handleSubmit(e); }} className="p-6 flex flex-col md:grid md:grid-cols-12 md:gap-8 gap-5 items-start">
             {formValidationErrors.submit && (
-              <div className="p-3 bg-red-50 border border-red-100 text-red-800 rounded-xl text-xs flex items-center gap-2">
+              <div className="col-span-12 p-3 bg-red-50 border border-red-100 text-red-800 rounded-xl text-xs flex items-center gap-2 w-full">
                 <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
                 <span>{formValidationErrors.submit}</span>
               </div>
             )}
 
-            {/* 1. OPERATOR SELECTOR (Common to both: must know who is acting) */}
-          <div className="flex flex-col gap-1.5" id="field-operario">
-            <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[#07474e]" />
-              Operario Responsable
-            </label>
-            <div className="relative">
-              <select
-                value={selectedOperarioId}
-                onChange={(e) => setSelectedOperarioId(e.target.value)}
-                className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
-              >
-                {operarios.map((op) => {
-                  const tradesStr = op.especialidades && op.especialidades.length > 0
-                    ? ` - [${op.especialidades.map(e => e === 'paleta' ? 'Paleta' : e === 'pintor' ? 'Pintor' : e === 'electricista' ? 'Electricista' : e === 'fontanero' ? 'Fontanero' : e).join(', ')}]`
-                    : '';
-                  return (
-                    <option key={op.id} value={op.id}>
-                      {op.nombre} ({op.rol === 'operario' ? 'Operario' : 'Jefe de Equipo'}){tradesStr}
-                    </option>
-                  );
-                })}
-              </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400 font-light text-xs">
-                ▲▼
+            {/* Columna Izquierda (Selectores de Control y Geovalla) */}
+            <div className="col-span-12 md:col-span-5 flex flex-col gap-5 w-full">
+              {/* 1. OPERATOR SELECTOR (Common to both: must know who is acting) */}
+              <div className="flex flex-col gap-1.5" id="field-operario">
+                <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#07474e]" />
+                  Operario Responsable
+                </label>
+                <div className="relative">
+                  <select
+                    value={selectedOperarioId}
+                    onChange={(e) => setSelectedOperarioId(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
+                  >
+                    {operarios.map((op) => {
+                      const tradesStr = op.especialidades && op.especialidades.length > 0
+                        ? ` - [${op.especialidades.map(e => e === 'paleta' ? 'Paleta' : e === 'pintor' ? 'Pintor' : e === 'electricista' ? 'Electricista' : e === 'fontanero' ? 'Fontanero' : e).join(', ')}]`
+                        : '';
+                      return (
+                        <option key={op.id} value={op.id}>
+                          {op.nombre} ({op.rol === 'operario' ? 'Operario' : 'Jefe de Equipo'}){tradesStr}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400 font-light text-xs">
+                    ▲▼
+                  </div>
+                </div>
+                {formValidationErrors.operario && (
+                  <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1">
+                    ⚠️ {formValidationErrors.operario}
+                  </p>
+                )}
               </div>
-            </div>
-            {formValidationErrors.operario && (
-              <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1">
-                ⚠️ {formValidationErrors.operario}
-              </p>
-            )}
-          </div>
 
-          {/* 2. ACTIVE WORKS (Common to both: determines geofencing and reported workspace) */}
-          <div className="flex flex-col gap-1.5" id="field-obra">
-            <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-              <Briefcase className="w-3.5 h-3.5 text-[#07474e]" />
-              Obra Activa
-            </label>
-            <div className="relative">
-              <select
-                value={selectedObraId}
-                onChange={(e) => setSelectedObraId(e.target.value)}
-                className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
-              >
-                <option value="">-- Selecciona la obra en curso --</option>
-                {obras.map((obra) => (
-                  <option key={obra.id} value={obra.id}>
-                    {obra.nombre}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400 font-light text-xs">
-                ▲▼
-              </div>
-            </div>
-            {formValidationErrors.obra && (
-              <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1">
-                ⚠️ {formValidationErrors.obra}
-              </p>
-            )}
+              {/* 2. ACTIVE WORKS (Common to both: determines geofencing and reported workspace) */}
+              <div className="flex flex-col gap-1.5" id="field-obra">
+                <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-[#07474e]" />
+                  Obra Activa
+                </label>
+                <div className="relative">
+                  <select
+                    value={selectedObraId}
+                    onChange={(e) => setSelectedObraId(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
+                  >
+                    <option value="">-- Selecciona la obra en curso --</option>
+                    {obras.map((obra) => (
+                      <option key={obra.id} value={obra.id}>
+                        {obra.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400 font-light text-xs">
+                    ▲▼
+                  </div>
+                </div>
+                {formValidationErrors.obra && (
+                  <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1">
+                    ⚠️ {formValidationErrors.obra}
+                  </p>
+                )}
 
-            {/* GEOVALLADO LIVE FEEDBACK WIDGET */}
-            {(() => {
-              const selectedObra = obras.find(o => o.id === selectedObraId);
-              if (!selectedObra) return null;
+                {/* GEOVALLADO LIVE FEEDBACK WIDGET */}
+                {(() => {
+                  const selectedObra = obras.find(o => o.id === selectedObraId);
+                  if (!selectedObra) return null;
 
-              if (selectedObra.geovalla_activa) {
-                return (
-                  <div className="mt-2.5 p-3 rounded-2xl bg-teal-50/55 border border-teal-100 flex flex-col gap-2 animate-fadeIn">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <Shield className="w-3.5 h-3.5 text-[#07474e] shrink-0" />
-                        <span className="text-[11px] font-black font-mono uppercase tracking-wider text-[#07474e]">Geovalla Activa</span>
-                      </div>
-                      <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded-full bg-teal-100 text-[#07474e] border border-teal-200">
-                        Rango: {selectedObra.radio || 150}m
-                      </span>
-                    </div>
-                    
-                    <p className="text-[10px] text-gray-600 leading-relaxed">
-                      📍 Ubicación: <strong>{selectedObra.direccion}</strong>. Para fichar, debes estar dentro del radio de obra.
-                    </p>
-
-                    {/* GPS checking state spinner */}
-                    {gpsChecking && (
-                      <div className="flex items-center gap-2 py-1.5 px-2 bg-white rounded-xl border border-teal-100 shadow-xs animate-pulse">
-                        <div className="w-3 h-3 border-2 border-[#07474e] border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-[10px] font-mono font-bold text-[#07474e]">{gpsStatusText}</span>
-                      </div>
-                    )}
-
-                    {/* GPS verified state */}
-                    {!gpsChecking && gpsVerifiedDistance !== null && (
-                      <div className="flex flex-col gap-2">
-                        <div className={`flex items-center gap-2 py-2 px-3 rounded-xl border shadow-xs ${
-                          gpsVerifiedDistance <= (selectedObra.radio || 150)
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                            : 'bg-red-50 border-red-200 text-red-800'
-                        }`}>
-                          <Locate className="w-4 h-4 shrink-0" />
-                          <div className="text-xs font-mono leading-tight">
-                            <strong>Ubicación verificada:</strong> Estás a de la obra: {Math.round(gpsVerifiedDistance)}m.
-                            <div className="font-bold text-[10px] mt-0.5 uppercase tracking-wider">
-                              {gpsVerifiedDistance <= (selectedObra.radio || 150) 
-                                ? '✔️ UBICACIÓN EN RANGO' 
-                                : '❌ VERIFICACIÓN FALLIDA (Fuera del radio)'}
-                            </div>
+                  if (selectedObra.geovalla_activa) {
+                    return (
+                      <div className="mt-2.5 p-3 rounded-2xl bg-teal-50/55 border border-teal-100 flex flex-col gap-2 animate-fadeIn">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <Shield className="w-3.5 h-3.5 text-[#07474e] shrink-0" />
+                            <span className="text-[11px] font-black font-mono uppercase tracking-wider text-[#07474e]">Geovalla Activa</span>
                           </div>
+                          <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded-full bg-teal-100 text-[#07474e] border border-teal-200">
+                            Rango: {selectedObra.radio || 150}m
+                          </span>
                         </div>
+                        
+                        <p className="text-[10px] text-gray-600 leading-relaxed">
+                          📍 Ubicación: <strong>{selectedObra.direccion}</strong>. Para fichar, debes estar dentro del radio de obra.
+                        </p>
 
-                        {gpsVerifiedDistance > (selectedObra.radio || 150) && (
-                          <div className="p-3 bg-rose-50 border border-rose-250 rounded-xl text-xs text-rose-850 leading-relaxed font-semibold animate-fadeIn">
-                            <span className="font-black text-rose-800 uppercase block font-mono text-[10px] mb-1">⚠️ Fuera del Límite de la Obra</span>
-                            Estás intentando registrar asistencia fuera del radio geolocalizado de la obra (Rango permitido: {selectedObra.radio || 150}m). 
-                            Acércate al recinto para validar tu fichaje de forma segura. Si estás dentro pero el satélite no actualiza, sal a campo libre unos instantes.
+                        {/* GPS checking state spinner */}
+                        {gpsChecking && (
+                          <div className="flex items-center gap-2 py-1.5 px-2 bg-white rounded-xl border border-teal-100 shadow-xs animate-pulse">
+                            <div className="w-3 h-3 border-2 border-[#07474e] border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-[10px] font-mono font-bold text-[#07474e]">{gpsStatusText}</span>
+                          </div>
+                        )}
+
+                        {/* GPS verified state */}
+                        {!gpsChecking && gpsVerifiedDistance !== null && (
+                          <div className="flex flex-col gap-2">
+                            <div className={`flex items-center gap-2 py-2 px-3 rounded-xl border shadow-xs ${
+                              gpsVerifiedDistance <= (selectedObra.radio || 150)
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                                : 'bg-red-50 border-red-200 text-red-800'
+                            }`}>
+                              <Locate className="w-4 h-4 shrink-0" />
+                              <div className="text-xs font-mono leading-tight">
+                                <strong>Ubicación verificada:</strong> Estás a {Math.round(gpsVerifiedDistance)}m de la obra.
+                                <div className="font-bold text-[10px] mt-0.5 uppercase tracking-wider">
+                                  {gpsVerifiedDistance <= (selectedObra.radio || 150) 
+                                    ? '✔️ UBICACIÓN EN RANGO' 
+                                    : '❌ VERIFICACIÓN FALLIDA (Fuera del radio)'}
+                                </div>
+                              </div>
+                            </div>
+
+                            {gpsVerifiedDistance > (selectedObra.radio || 150) && (
+                              <div className="p-3 bg-rose-50 border border-rose-250 rounded-xl text-xs text-rose-850 leading-relaxed font-semibold animate-fadeIn">
+                                <span className="font-black text-rose-800 uppercase block font-mono text-[10px] mb-1">⚠️ Fuera del Límite de la Obra</span>
+                                Estás intentando registrar asistencia fuera del radio geolocalizado de la obra (Rango permitido: {selectedObra.radio || 150}m). 
+                                Acércate al recinto para validar tu fichaje de forma segura. Si estás dentro pero el satélite no actualiza, sal a campo libre unos instantes.
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* GPS Blocking/validation Errors inside widget for high-visibility */}
+                        {formValidationErrors.gps && (
+                          <div className="p-2.5 bg-red-100 border border-red-200 text-red-900 rounded-xl text-[10px] leading-relaxed font-semibold">
+                            {formValidationErrors.gps}
                           </div>
                         )}
                       </div>
-                    )}
+                    );
+                  }
 
-                    {/* GPS Blocking/validation Errors inside widget for high-visibility */}
-                    {formValidationErrors.gps && (
-                      <div className="p-2.5 bg-red-100 border border-red-200 text-red-900 rounded-xl text-[10px] leading-relaxed font-semibold">
-                        {formValidationErrors.gps}
-                      </div>
-                    )}
-                  </div>
-                );
-              }
+                  return (
+                    <div className="mt-2.5 p-2 rounded-xl bg-gray-50 border border-gray-150 flex items-center gap-1.5 text-[10px] text-gray-500">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                      <span>Fichaje libre habilitado (Sin Geovalla obligatoria en este proyecto).</span>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
 
-              return (
-                <div className="mt-2.5 p-2 rounded-xl bg-gray-50 border border-gray-150 flex items-center gap-1.5 text-[10px] text-gray-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                  <span>Fichaje libre habilitado (Sin Geovalla obligatoria en este proyecto).</span>
-                </div>
-              );
-            })()}
-          </div>
+            {/* Columna Derecha (Fichaje o Parte Diario según pestaña) */}
+            <div className="col-span-12 md:col-span-7 flex flex-col gap-5 w-full border-t border-slate-100 pt-5 md:border-t-0 md:pt-0">
 
           {/* ==================== SUB-TAB 1: FICHAJE DE ENTRADA Y SALIDA ==================== */}
           {activeSubTab === 'fichaje' && (
@@ -1215,6 +1221,7 @@ export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
 
             </div>
           )}
+          </div>
         </form>)}
       </div>
 

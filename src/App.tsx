@@ -205,12 +205,12 @@ export default function App() {
         )}
 
         {activeTab === 'fichaje' && (
-          <div className="flex flex-col gap-6 items-center">
-            <div className="w-full max-w-xl">
+          <div className="flex flex-col gap-6 items-center w-full">
+            <div className="w-full max-w-4xl transition-all duration-300">
               <div className="mb-6 flex flex-col gap-1 items-center text-center">
                 <span className="text-[10px] font-mono font-black text-[#07474e] uppercase tracking-widest leading-none">Portal del Operario</span>
                 <h2 className="text-2xl font-extrabold text-[#0f172a] tracking-tight">Registro Diario de Trabajo</h2>
-                <p className="text-xs text-[#64748b] leading-relaxed max-w-sm mt-1.5">
+                <p className="text-xs text-[#64748b] leading-relaxed max-w-md mt-1.5 px-4 text-center">
                   Ficha tu jornada, controla tu posición GPS con geovallado activo y registra materiales instalados en obra de forma ágil.
                 </p>
               </div>
