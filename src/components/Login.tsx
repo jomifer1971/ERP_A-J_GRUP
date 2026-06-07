@@ -94,15 +94,15 @@ export default function Login({ onLogin }: LoginProps) {
     <div className="min-h-screen bg-[#f1f5f9] flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
         
-        {/* Header decoration */}
-        <div className="bg-[#07474e] px-8 pt-10 pb-12 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-teal-300 opacity-20 rounded-full translate-x-12 -translate-y-12"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-400 opacity-30 rounded-full -translate-x-8 translate-y-8"></div>
+        {/* Header decoration on a light background to preserve original logo branding colors */}
+        <div className="bg-[#f8fafc] border-b border-gray-100 px-8 pt-10 pb-10 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#3b92a3]/5 rounded-full translate-x-12 -translate-y-12 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#07474e]/5 rounded-full -translate-x-8 translate-y-8"></div>
           
           <div className="relative z-10 flex flex-col items-center">
-            {/* Logo scaled up for magnificent visibility! */}
-            <Logo className="h-20 md:h-24 w-auto transform hover:scale-105 transition-transform duration-300" showText={true} lightMode={true} />
-            <p className="text-teal-100/70 text-[10px] tracking-widest font-mono uppercase mt-4">MANAGEMENT PORTAL</p>
+            {/* Logo scaled up for magnificent visibility with original branding colors */}
+            <Logo className="h-20 md:h-24 w-auto transform hover:scale-105 transition-transform duration-300" showText={true} />
+            <p className="text-[#07474e]/60 text-[10px] tracking-widest font-mono font-bold uppercase mt-4">MANAGEMENT PORTAL</p>
           </div>
         </div>
 

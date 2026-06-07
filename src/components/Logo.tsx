@@ -8,18 +8,14 @@ import React from 'react';
 interface LogoProps {
   className?: string;
   showText?: boolean;
-  lightMode?: boolean;
 }
 
-export default function Logo({ className = "h-12", showText = true, lightMode = false }: LogoProps) {
-  // Brand colors matched precisely from image:
+export default function Logo({ className = "h-12", showText = true }: LogoProps) {
+  // Brand colors matched precisely from the uploaded corporate image:
   const mainTeal = "#07474e"; // Primary Dark Teal
   const arrowTeal = "#3b92a3"; // Arrow Accent Teal
-  const grayText = lightMode ? "#ffffff" : "#07474e";
-  const realGrayText = "#666666";
-
-  const textColor = lightMode ? "#ffffff" : mainTeal;
-  const subtextColor = lightMode ? "rgba(255,255,255,0.9)" : realGrayText;
+  const textColor = "#07474e"; // "A&J" color (always dark teal)
+  const subtextColor = "#666666"; // "BCN 2025" color (always grey)
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
@@ -33,7 +29,7 @@ export default function Logo({ className = "h-12", showText = true, lightMode = 
         {/* Leftmost Column (Smallest) */}
         <path 
           d="M30 155 L45 155 L45 130 L30 137 Z" 
-          stroke={mainTeal} 
+          stroke={arrowTeal} 
           strokeWidth="3" 
           strokeLinejoin="round"
           fill="none"
@@ -41,7 +37,7 @@ export default function Logo({ className = "h-12", showText = true, lightMode = 
         {/* Second Column (Medium) */}
         <path 
           d="M48 150 L63 150 L63 108 L48 118 Z" 
-          stroke={mainTeal} 
+          stroke={arrowTeal} 
           strokeWidth="3" 
           strokeLinejoin="round"
           fill="none"
@@ -49,7 +45,7 @@ export default function Logo({ className = "h-12", showText = true, lightMode = 
         {/* Third Column (Tallest) */}
         <path 
           d="M66 140 L81 140 L81 83 L66 95 Z" 
-          stroke={mainTeal} 
+          stroke={arrowTeal} 
           strokeWidth="3" 
           strokeLinejoin="round"
           fill="none"
@@ -86,12 +82,11 @@ export default function Logo({ className = "h-12", showText = true, lightMode = 
               x="185" 
               y="126" 
               fontFamily="system-ui, -apple-system, sans-serif" 
-              fontWeight="900" 
-              fontSize="48" 
-              fill={textColor}
               letterSpacing="-1"
+              fontSize="48"
             >
-              A&amp;J GRUP
+              <tspan fill={textColor} fontWeight="900">A&amp;J </tspan>
+              <tspan fill={arrowTeal} fontWeight="400">GRUP</tspan>
             </text>
 
             {/* "BCN 2025" */}
@@ -99,7 +94,7 @@ export default function Logo({ className = "h-12", showText = true, lightMode = 
               x="187" 
               y="173" 
               fontFamily="system-ui, -apple-system, sans-serif" 
-              fontWeight="500" 
+              fontWeight="400" 
               fontSize="34" 
               fill={subtextColor}
               letterSpacing="3"
