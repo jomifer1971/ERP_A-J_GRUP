@@ -8,6 +8,7 @@ import { supabase, isSupabaseConfigured } from '../config/supabaseClient';
 import { Obra, Usuario, ParteTrabajo, Fichaje } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import WeeklyClockingReport from './WeeklyClockingReport';
+import { enviarNotificacionReal } from '../utils/notificaciones';
 import { 
   Calendar, 
   Clock, 
@@ -453,6 +454,18 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
           };
           
           localStorage.setItem('aj_alertas_fichaje', JSON.stringify([newAlertItem, ...storedAlerts]));
+          
+          // Send real-time notification to Telegram API / Webhook if configured
+          try {
+            enviarNotificacionReal(
+              'RETRASO',
+              workerObj.nombre,
+              `Fichaje tardío registrado a las ${now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}. Desviación de ${minutesLate} min.`,
+              obraObj.nombre
+            );
+          } catch (notifErr) {
+            console.warn('No se pudo enviar notificación real:', notifErr);
+          }
           
           // Show simulated push notice to workspace log
           console.log('🔔 [Alerta Despachada]: Fichaje tardío para ' + workerObj.nombre + ' en ' + obraObj.nombre);

@@ -20,9 +20,12 @@ import {
   Sparkles,
   Check,
   ShieldCheck,
-  SmartphoneNfc
+  SmartphoneNfc,
+  Cog,
+  Volume2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { enviarNotificacionReal, ConfigNotificaciones, DEFAULT_CONFIG_NOTIF } from '../utils/notificaciones';
 
 interface AdminDashboardProps {
   user: Usuario;
@@ -85,6 +88,22 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
     ];
   });
 
+  // State for real-world notification dispatcher config
+  const [configNotif, setConfigNotif] = useState<ConfigNotificaciones>(() => {
+    const saved = localStorage.getItem('aj_config_notificaciones');
+    if (saved) {
+      try { return JSON.parse(saved); } catch {}
+    }
+    return DEFAULT_CONFIG_NOTIF;
+  });
+
+  const [testResult, setTestResult] = useState<{ success: boolean; text: string } | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('aj_config_notificaciones', JSON.stringify(configNotif));
+  }, [configNotif]);
+
   // Mobile simulator active notification display
   const [showActiveMobilePopup, setShowActiveMobilePopup] = useState<AlertaNotificacion | null>(null);
 
@@ -105,7 +124,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
   };
 
   // Automated trigger simulators
-  const triggerSimulation = (type: 'RETRASO' | 'AUSENCIA') => {
+  const triggerSimulation = async (type: 'RETRASO' | 'AUSENCIA') => {
     const randomOp = type === 'RETRASO' ? 'Juan Martínez' : 'Jordi Vila';
     const randomTel = type === 'RETRASO' ? '+34 689 123 456' : '+34 612 841 022';
     const randomObra = type === 'RETRASO' ? 'Instalación Eléctrica Nave Poblenou' : 'Pintura y Suelos Consultorio Médico';
@@ -128,17 +147,48 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
       fecha_hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
       obra: randomObra,
       enviado_sms: channelSms,
-      enviado_telegram: channelTelegram,
+      enviado_telegram: channelTelegram || configNotif.activo,
       leido: false
     };
 
     setAlertas(prev => [newAl, ...prev]);
     setShowActiveMobilePopup(newAl);
 
+    // If real notification channel is toggled on, dispatch a live notification!
+    if (configNotif.activo) {
+      try {
+        await enviarNotificacionReal(type, randomOp, msg, randomObra);
+      } catch (err) {
+        console.error('Error enviando notificación en vivo:', err);
+      }
+    }
+
     // Auto-dismiss the popup simulation after 8 seconds
     setTimeout(() => {
       setShowActiveMobilePopup(null);
     }, 8000);
+  };
+
+  const handleTestConnection = async () => {
+    setIsTesting(true);
+    setTestResult(null);
+    try {
+      const res = await enviarNotificacionReal(
+        'PRUEBA',
+        user.nombre,
+        '¡Genial! Tu pasarela de alertas en tiempo real está correctamente configurada y vinculada a tu teléfono.',
+        'Prueba de Sistemas A&J'
+      );
+      if (res.success) {
+        setTestResult({ success: true, text: `✓ Mensaje enviado correctamente: ${res.detalles || 'Pasarela activa'}` });
+      } else {
+        setTestResult({ success: false, text: `❌ Fallo: ${res.error || 'Causa desconocida'}` });
+      }
+    } catch (e: any) {
+      setTestResult({ success: false, text: `❌ Fallo técnico al contactar APIs: ${e.message || e}` });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   const unreadCount = alertas.filter(a => !a.leido).length;
@@ -427,21 +477,119 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             </div>
           </div>
 
-          {/* TELEPHONE PREVIEW DESIGN ACCENTS */}
-          <div className="bg-white rounded-3xl p-5 border border-gray-150 flex flex-col gap-3 shadow-sm">
-            <span className="text-[10px] font-bold text-gray-400 font-mono uppercase tracking-wider">Dispositivo de Destino:</span>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 text-[#07474e] flex items-center justify-center shrink-0 border border-teal-100">
-                <Smartphone className="w-5 h-5" />
-              </div>
-              <div className="flex-1 text-xs">
-                <p className="font-bold text-gray-800">Móvil Vinculado Jefatura:</p>
-                <p className="text-gray-550 font-mono mt-0.5 leading-none">{user.telefono || '+34 600 CEO GRUP'}</p>
-              </div>
+          {/* REAL TELEGRAM AND WEBHOOK GATEWAY CONFIGURATION */}
+          <div className="bg-white rounded-3xl p-5 md:p-6 border border-gray-200 flex flex-col gap-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+              <span className="text-xs font-black text-[#0f172a] uppercase tracking-wider font-mono flex items-center gap-1.5">
+                <Cog className="w-4 h-4 text-emerald-600 animate-spin-slow" />
+                Pasarela de Alertas Móviles
+              </span>
+              
+              {/* Green Single Switch Toggle Button based on user's preference in guidelines */}
+              <button
+                onClick={() => setConfigNotif(prev => ({ ...prev, activo: !prev.activo }))}
+                className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                  configNotif.activo 
+                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200 hover:bg-emerald-600' 
+                    : 'bg-gray-100 text-gray-400 border border-gray-200 hover:bg-gray-150'
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full ${configNotif.activo ? 'bg-white animate-ping' : 'bg-gray-300'}`} />
+                {configNotif.activo ? 'Canal Activo ✓' : 'Inactivo'}
+              </button>
             </div>
-            <p className="text-[11px] text-gray-500 leading-relaxed mt-1">
-              En entornos de producción real, este módulo se enlaza nativamente con proveedores como **Twilio, Whatsapp Business API o Sendgrid** para enviar un mensaje instantáneo directamente al terminal del responsable a pie de obra.
+
+            <p className="text-[11px] text-gray-500 leading-normal">
+              Vincula un Bot de Telegram gratuito para recibir alertas en tiempo real en tu móvil (CEO, Jefaturas). También soporta Webhooks universales de Zapier, Make o PowerAutomate.
             </p>
+
+            <div className="flex flex-col gap-3">
+              {/* Telegram config fields */}
+              <div className="bg-slate-50 p-3 rounded-2xl border border-gray-150 flex flex-col gap-2.5">
+                <span className="text-[10px] font-bold text-[#07474e] uppercase tracking-wide flex items-center gap-1 font-mono">
+                  📱 Canal Telegram (Gratuito e Instantáneo)
+                </span>
+                
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-mono font-bold text-gray-400 uppercase">Token del Bot de Telegram:</label>
+                  <input
+                    type="password"
+                    placeholder="Ej. 12345678:ABCdef..."
+                    value={configNotif.telegramToken}
+                    onChange={e => setConfigNotif(prev => ({ ...prev, telegramToken: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-mono font-bold"
+                  />
+                  <span className="text-[8px] text-gray-400 leading-none">Pídelo en Telegram a @BotFather iniciando un bot rápido de alertas.</span>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-mono font-bold text-gray-400 uppercase">Chat ID del CEO o Grupo:</label>
+                  <input
+                    type="text"
+                    placeholder="Ej. 987654321"
+                    value={configNotif.telegramChatId}
+                    onChange={e => setConfigNotif(prev => ({ ...prev, telegramChatId: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-mono font-bold"
+                  />
+                  <span className="text-[8px] text-gray-400 leading-none">Consigue tu ID enviando un chat al bot @userinfobot o @GetMyIdBot.</span>
+                </div>
+              </div>
+
+              {/* Webhook URL config fields */}
+              <div className="bg-slate-50 p-3 rounded-2xl border border-gray-150 flex flex-col gap-2.5">
+                <span className="text-[10px] font-bold text-[#07474e] uppercase tracking-wide flex items-center gap-1 font-mono">
+                  🔗 Webhook Universal (Zapier, Make, Twilio)
+                </span>
+                
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-mono font-bold text-gray-400 uppercase">URL de recepción POST:</label>
+                  <input
+                    type="text"
+                    placeholder="https://hooks.zapier.com/hooks/catch/..."
+                    value={configNotif.webhookUrl}
+                    onChange={e => setConfigNotif(prev => ({ ...prev, webhookUrl: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700"
+                  />
+                  <span className="text-[8px] text-gray-400 leading-none">Envía un JSON estructurado con el nombre del operario, obra y demora.</span>
+                </div>
+              </div>
+
+              {/* Dynamic feedback banners */}
+              {testResult && (
+                <div className={`p-3 rounded-xl text-xs border ${
+                  testResult.success 
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                    : 'bg-red-50 text-red-800 border-red-200'
+                }`}>
+                  <p className="font-semibold leading-relaxed font-mono whitespace-pre-line">{testResult.text}</p>
+                </div>
+              )}
+
+              {/* Test Action Trigger buttons */}
+              <button
+                onClick={handleTestConnection}
+                disabled={isTesting || (!configNotif.telegramToken && !configNotif.webhookUrl)}
+                className={`w-full py-2.5 rounded-xl font-bold font-mono text-[10px] uppercase tracking-wider transition-colors active:scale-98 flex items-center justify-center gap-2 cursor-pointer ${
+                  isTesting 
+                    ? 'bg-gray-150 text-gray-400 border border-gray-200' 
+                    : (!configNotif.telegramToken && !configNotif.webhookUrl)
+                      ? 'bg-gray-50 text-gray-300 border border-gray-200 cursor-not-allowed'
+                      : 'bg-[#07474e] hover:bg-[#0b4e56] text-white shadow-sm'
+                }`}
+              >
+                {isTesting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 rounded-full border-2 border-gray-200 border-t-gray-500 animate-spin"></div>
+                    Enviando prueba al móvil...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    Enviar Alerta de Prueba al Móvil
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
         </div>
