@@ -23,6 +23,7 @@ export default function RolesTab({ user }: RolesTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [newUserNombre, setNewUserNombre] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserTelefono, setNewUserTelefono] = useState('');
   const [newUserRol, setNewUserRol] = useState<'ceo' | 'admin' | 'jefe_equipo' | 'operario'>('operario');
   const [newUserEspecialidades, setNewUserEspecialidades] = useState<string[]>([]);
   const [newUserJefeId, setNewUserJefeId] = useState<string>('');
@@ -47,11 +48,11 @@ export default function RolesTab({ user }: RolesTabProps) {
 
   const initializeDefaultUsers = () => {
     const defaults: Usuario[] = [
-      { id: 'u-1', nombre: 'Javier Domínguez', email: 'ceo@ajgrup.com', rol: 'ceo', validado: true, especialidades: ['electricista', 'fontanero'] },
-      { id: 'u-2', nombre: 'Admin Master', email: 'admin@ajgrup.com', rol: 'admin', validado: true, especialidades: ['electricista'] },
-      { id: 'u-3', nombre: 'Carlos Jefe', email: 'jefe@ajgrup.com', rol: 'jefe_equipo', validado: true, especialidades: ['paleta', 'fontanero'] },
-      { id: 'u-4', nombre: 'Juan Operario', email: 'juan@ajgrup.com', rol: 'operario', validado: true, especialidades: ['paleta'], jefeId: 'u-3' },
-      { id: 'u-5', nombre: 'Nuevo Empleado', email: 'nuevo@ajgrup.com', rol: 'operario', validado: false, especialidades: ['pintor'] },
+      { id: 'u-1', nombre: 'Javier Domínguez', email: 'ceo@ajgrup.com', rol: 'ceo', validado: true, especialidades: ['electricista', 'fontanero'], telefono: '+34 601 234 567' },
+      { id: 'u-2', nombre: 'Admin Master', email: 'admin@ajgrup.com', rol: 'admin', validado: true, especialidades: ['electricista'], telefono: '+34 602 345 678' },
+      { id: 'u-3', nombre: 'Carlos Jefe', email: 'jefe@ajgrup.com', rol: 'jefe_equipo', validado: true, especialidades: ['paleta', 'fontanero'], telefono: '+34 603 456 789' },
+      { id: 'u-4', nombre: 'Juan Operario', email: 'juan@ajgrup.com', rol: 'operario', validado: true, especialidades: ['paleta'], jefeId: 'u-3', telefono: '+34 604 567 890' },
+      { id: 'u-5', nombre: 'Nuevo Empleado', email: 'nuevo@ajgrup.com', rol: 'operario', validado: false, especialidades: ['pintor'], telefono: '+34 605 678 901' },
     ];
     setUsuarios(defaults);
     localStorage.setItem('aj_users_v2', JSON.stringify(defaults));
@@ -152,7 +153,8 @@ export default function RolesTab({ user }: RolesTabProps) {
       rol: newUserRol,
       validado: true, // Pre-approved by admin
       especialidades: newUserEspecialidades,
-      jefeId: newUserRol === 'operario' && newUserJefeId ? newUserJefeId : undefined
+      jefeId: newUserRol === 'operario' && newUserJefeId ? newUserJefeId : undefined,
+      telefono: newUserTelefono.trim() || undefined
     };
 
     const updated = [...usuarios, newUser];
@@ -160,6 +162,7 @@ export default function RolesTab({ user }: RolesTabProps) {
     
     setNewUserNombre('');
     setNewUserEmail('');
+    setNewUserTelefono('');
     setNewUserRol('operario');
     setNewUserEspecialidades([]);
     setNewUserJefeId('');
@@ -244,7 +247,7 @@ export default function RolesTab({ user }: RolesTabProps) {
       {/* Add New User Panel Accordion */}
       {isAdding && (
         <form onSubmit={handleCreateUser} className="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 flex flex-col gap-4 animate-fadeIn">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] font-bold text-gray-500 uppercase font-mono tracking-wider">Nombre Completo</label>
               <input 
@@ -266,6 +269,17 @@ export default function RolesTab({ user }: RolesTabProps) {
                 placeholder="pedro@ajgrup.com"
                 className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-[#07474e]"
                 required
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-gray-500 uppercase font-mono tracking-wider">Móvil / Contacto</label>
+              <input 
+                type="text" 
+                value={newUserTelefono}
+                onChange={e => setNewUserTelefono(e.target.value)}
+                placeholder="+34 600 000 000"
+                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-[#07474e]"
               />
             </div>
 
@@ -393,6 +407,9 @@ export default function RolesTab({ user }: RolesTabProps) {
                         <div>
                           <div className="text-xs font-extrabold text-gray-800">{u.nombre}</div>
                           <div className="text-[10px] font-mono text-gray-400 mt-0.5">{u.email}</div>
+                          {u.telefono && (
+                            <div className="text-[9px] font-mono font-bold text-[#07474e] mt-1 bg-teal-50 px-1.5 py-0.5 rounded inline-block">📞 {u.telefono}</div>
+                          )}
                         </div>
                       </div>
                     </td>

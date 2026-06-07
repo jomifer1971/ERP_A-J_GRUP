@@ -14,12 +14,12 @@ interface LoginProps {
 
 // Fallback simulated users 
 const MOCK_USERS: Usuario[] = [
-  { id: 'u-1', nombre: 'Javier Domínguez', email: 'ceo@ajgrup.com', rol: 'ceo', validado: true, especialidades: ['electricista', 'fontanero'] },
-  { id: 'u-2', nombre: 'Admin Master', email: 'admin@ajgrup.com', rol: 'admin', validado: true, especialidades: ['electricista'] },
-  { id: 'u-3', nombre: 'Carlos Jefe', email: 'jefe@ajgrup.com', rol: 'jefe_equipo', validado: true, especialidades: ['paleta', 'fontanero'] },
-  { id: 'u-4', nombre: 'Juan Operario', email: 'juan@ajgrup.com', rol: 'operario', validado: true, especialidades: ['paleta'], jefeId: 'u-3' },
-  { id: 'u-5', nombre: 'Nuevo Empleado', email: 'nuevo@ajgrup.com', rol: 'operario', validado: false, especialidades: ['pintor'] },
-  { id: 'u-jomi', nombre: 'José Miguel Domínguez', email: 'jomifer1971@gmail.com', rol: 'ceo', validado: true, especialidades: ['paleta', 'pintor', 'electricista', 'fontanero'] },
+  { id: 'u-1', nombre: 'Javier Domínguez', email: 'ceo@ajgrup.com', rol: 'ceo', validado: true, especialidades: ['electricista', 'fontanero'], telefono: '+34 601 234 567' },
+  { id: 'u-2', nombre: 'Admin Master', email: 'admin@ajgrup.com', rol: 'admin', validado: true, especialidades: ['electricista'], telefono: '+34 602 345 678' },
+  { id: 'u-3', nombre: 'Carlos Jefe', email: 'jefe@ajgrup.com', rol: 'jefe_equipo', validado: true, especialidades: ['paleta', 'fontanero'], telefono: '+34 603 456 789' },
+  { id: 'u-4', nombre: 'Juan Operario', email: 'juan@ajgrup.com', rol: 'operario', validado: true, especialidades: ['paleta'], jefeId: 'u-3', telefono: '+34 604 567 890' },
+  { id: 'u-5', nombre: 'Nuevo Empleado', email: 'nuevo@ajgrup.com', rol: 'operario', validado: false, especialidades: ['pintor'], telefono: '+34 605 678 901' },
+  { id: 'u-jomi', nombre: 'José Miguel Domínguez', email: 'jomifer1971@gmail.com', rol: 'ceo', validado: true, especialidades: ['paleta', 'pintor', 'electricista', 'fontanero'], telefono: '+34 699 987 654' },
 ];
 export default function Login({ onLogin }: LoginProps) {
   const [email, setEmail] = useState('');

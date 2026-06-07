@@ -11,6 +11,7 @@ export interface Usuario {
   validado: boolean;
   especialidades?: string[];
   jefeId?: string;
+  telefono?: string;
 }
 
 export interface Obra {

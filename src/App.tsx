@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Usuario } from './types';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ParteDiarioForm from './components/ParteDiarioForm';
 import Logo from './components/Logo';
-import { LogOut, User as UserIcon, Database, Wifi, WifiOff, LayoutDashboard, Briefcase, Warehouse, UserCheck, ShieldCheck, Clock8 } from 'lucide-react';
+import { LogOut, User as UserIcon, Database, Wifi, WifiOff, LayoutDashboard, Briefcase, Warehouse, UserCheck, ShieldCheck, Clock8, Smartphone, Monitor, Menu, X, ChevronDown } from 'lucide-react';
 import { isSupabaseConfigured } from './config/supabaseClient';
 import ObrasTab from './components/ObrasTab';
 import AlmacenesTab from './components/AlmacenesTab';
@@ -46,6 +46,8 @@ export default function App() {
     return 'fichaje';
   });
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const handleLogin = (loggedInUser: Usuario) => {
     setUser(loggedInUser);
     localStorage.setItem('aj_user_session', JSON.stringify(loggedInUser));
@@ -55,6 +57,26 @@ export default function App() {
     setUser(null);
     localStorage.removeItem('aj_user_session');
   };
+
+  const [devicePlatform, setDevicePlatform] = useState<'movil' | 'pc'>(() => {
+    const isMobileUA = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 1024;
+    return (isMobileUA || isSmallScreen) ? 'movil' : 'pc';
+  });
+
+  const [useMobileViewOnPC, setUseMobileViewOnPC] = useState<boolean>(true);
+
+  // Monitor screen size dynamically for adaptiveness
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isSmallScreen = window.innerWidth < 1024;
+      setDevicePlatform((isMobileUA || isSmallScreen) ? 'movil' : 'pc');
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   if (!user) {
     return <Login onLogin={handleLogin} />;
@@ -106,8 +128,9 @@ export default function App() {
 
       {/* 2. MAIN RESPONSIVE CONTENT AREA */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6">
-              {/* Navigation Tabs Grid-style or flex wrap for premium adaptivity */}
-        <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
+        
+        {/* DESKTOP NAVIGATION TABS: Hidden on mobile (md breakpoint), elegant flat on PC */}
+        <div className="hidden md:flex flex-wrap gap-2 border-b border-gray-200 pb-2">
           {isAdmin && (
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -199,23 +222,267 @@ export default function App() {
           )}
         </div>
 
+        {/* MOBILE COLLAPSIBLE MENU: Visible on mobile, hides on medium+ viewports */}
+        <div className="md:hidden flex flex-col gap-2 relative w-full mb-1">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="w-full flex items-center justify-between gap-3 p-4 bg-[#07474e] hover:bg-[#0b5c65] text-white rounded-2xl shadow-sm transition-all focus:outline-none"
+          >
+            <div className="flex items-center gap-2 text-xs font-black font-mono uppercase tracking-wider">
+              {activeTab === 'dashboard' && <LayoutDashboard className="w-4 h-4 text-emerald-400" />}
+              {activeTab === 'fichaje' && <Clock8 className="w-4 h-4 text-teal-300" />}
+              {activeTab === 'obras' && <Briefcase className="w-4 h-4 text-amber-400" />}
+              {activeTab === 'almacenes' && <Warehouse className="w-4 h-4 text-[#bfdbfe]" />}
+              {activeTab === 'cuenta' && <UserCheck className="w-4 h-4 text-[#99f6e4]" />}
+              {activeTab === 'turnos' && <Clock8 className="w-4 h-4 text-indigo-300 animate-pulse" />}
+              {activeTab === 'roles' && <ShieldCheck className="w-4 h-4 text-rose-400" />}
+              
+              <span>
+                Menú: {
+                  activeTab === 'dashboard' ? 'Mando Central' :
+                  activeTab === 'fichaje' ? 'Registrar Parte / Fichaje' :
+                  activeTab === 'obras' ? 'Obras y Planos' :
+                  activeTab === 'almacenes' ? 'Almacenes y OCR' :
+                  activeTab === 'cuenta' ? 'Ficha y Estadísticas' :
+                  activeTab === 'turnos' ? 'Turnos y Horarios' :
+                  activeTab === 'roles' ? 'Seguridad / Roles' : 'Sección'
+                }
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono font-bold tracking-wide text-teal-155 opacity-90 border border-teal-200/25 px-2 py-0.5 rounded-md bg-white/10">Tocar para cambiar</span>
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </div>
+          </button>
+
+          {/* Collapsible Dropdown Overlaid list */}
+          {mobileMenuOpen && (
+            <div className="absolute top-14 left-0 w-full bg-white border border-gray-250 rounded-2xl shadow-xl z-50 p-2.5 flex flex-col gap-1.5 animate-fadeIn">
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => { setActiveTab('dashboard'); setMobileMenuOpen(false); }}
+                  className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                    activeTab === 'dashboard'
+                      ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                      : 'bg-white text-gray-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4 text-[#07474e]" />
+                  Mando Central
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => { setActiveTab('fichaje'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                  activeTab === 'fichaje'
+                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    : 'bg-white text-gray-700 hover:bg-slate-50'
+                }`}
+              >
+                <Clock8 className="w-4 h-4 text-teal-600" />
+                Registrar Parte / Fichaje
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setActiveTab('obras'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                  activeTab === 'obras'
+                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    : 'bg-white text-gray-700 hover:bg-slate-50'
+                }`}
+              >
+                <Briefcase className="w-4 h-4 text-amber-600" />
+                Obras y Planos
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setActiveTab('almacenes'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                  activeTab === 'almacenes'
+                    ? 'bg-[#07474e]/5 text-[#07474e] border-l-4 border-indigo-600'
+                    : 'bg-white text-gray-700 hover:bg-slate-50'
+                }`}
+              >
+                <Warehouse className="w-4 h-4 text-indigo-600" />
+                Almacenes y OCR
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setActiveTab('cuenta'); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                  activeTab === 'cuenta'
+                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    : 'bg-white text-gray-700 hover:bg-slate-50'
+                }`}
+              >
+                <UserCheck className="w-4 h-4 text-teal-700" />
+                Ficha y Estadísticas
+              </button>
+
+              {isAdmin && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('turnos'); setMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                      activeTab === 'turnos'
+                        ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                        : 'bg-white text-gray-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Clock8 className="w-4 h-4 text-indigo-700" />
+                    Turnos y Horarios
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('roles'); setMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                      activeTab === 'roles'
+                        ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                        : 'bg-white text-gray-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <ShieldCheck className="w-4 h-4 text-rose-600" />
+                    Seguridad / Roles
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Dynamic Route Screen Switcher */}
         {activeTab === 'dashboard' && isAdmin && (
           <AdminDashboard user={user} />
         )}
 
         {activeTab === 'fichaje' && (
-          <div className="flex flex-col gap-6 items-center w-full">
-            <div className="w-full max-w-4xl transition-all duration-300">
-              <div className="mb-6 flex flex-col gap-1 items-center text-center">
+          <div className="flex flex-col gap-6 items-center w-full animate-fadeIn">
+            <div className="w-full max-w-4xl transition-all duration-300 flex flex-col gap-6">
+              
+              {/* Control banner for adaptive view */}
+              <div className="w-full bg-white rounded-3xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-teal-50 rounded-2xl text-[#07474e] shrink-0">
+                    {devicePlatform === 'pc' ? <Monitor className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-xs md:text-sm font-bold text-gray-900 leading-tight">Adaptabilidad Inteligente</h4>
+                      <span className="text-[10px] font-extrabold font-mono px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-150 text-indigo-700 uppercase">
+                        {devicePlatform === 'pc' ? '🖥️ Entorno PC / Oficina' : '📱 Entorno Móvil / Obra'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {devicePlatform === 'pc' 
+                        ? 'Detector: Estás conectado desde un ordenador de control. Hemos empaquetado la vista en un simulador móvil.'
+                        : 'Detector: Estás conectado desde un smartphone de campo en obra. El diseño se adapta de forma nativa a tu pantalla.'}
+                    </p>
+                  </div>
+                </div>
+
+                {devicePlatform === 'pc' && (
+                  <div className="flex items-center gap-1.5 self-start md:self-auto shrink-0 bg-slate-50 p-1 rounded-xl border border-slate-150">
+                    <button
+                      type="button"
+                      onClick={() => setUseMobileViewOnPC(true)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        useMobileViewOnPC 
+                          ? 'bg-white shadow-4xs text-[#07474e] border border-slate-250/20' 
+                          : 'text-gray-500 hover:text-gray-800'
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      Móvil
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUseMobileViewOnPC(false)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        !useMobileViewOnPC
+                          ? 'bg-white shadow-4xs text-[#07474e] border border-slate-250/20'
+                          : 'text-gray-500 hover:text-gray-800'
+                      }`}
+                    >
+                      <Monitor className="w-3.5 h-3.5" />
+                      Pantalla Completa
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Main title section */}
+              <div className="flex flex-col gap-1 items-center text-center">
                 <span className="text-[10px] font-mono font-black text-[#07474e] uppercase tracking-widest leading-none">Portal del Operario</span>
                 <h2 className="text-2xl font-extrabold text-[#0f172a] tracking-tight">Registro Diario de Trabajo</h2>
-                <p className="text-xs text-[#64748b] leading-relaxed max-w-md mt-1.5 px-4 text-center">
+                <p className="text-xs text-[#64748b] leading-relaxed max-w-md mt-1 px-4 text-center">
                   Ficha tu jornada, controla tu posición GPS con geovallado activo y registra materiales instalados en obra de forma ágil.
                 </p>
               </div>
               
-              <ParteDiarioForm user={user} />
+              {devicePlatform === 'pc' && useMobileViewOnPC ? (
+                <div className="flex justify-center w-full py-4 relative">
+                  {/* Smartphone frame container */}
+                  <div className="relative mx-auto rounded-[50px] border-[12px] border-slate-900 bg-slate-100 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] w-[385px] min-h-[790px] max-w-full overflow-hidden flex flex-col hover:border-slate-800 transition-colors duration-300">
+                    
+                    {/* Dynamic Notch / Island */}
+                    <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-28 h-5.5 bg-slate-900 rounded-[20px] z-50 flex items-center justify-between px-3">
+                      <span className="w-2 h-2 rounded-full bg-slate-800/80 border border-slate-700/50"></span>
+                      <span className="w-12 h-1 bg-slate-950 rounded-full"></span>
+                      <span className="w-2 h-2 rounded-full bg-blue-900 border border-blue-600/30"></span>
+                    </div>
+
+                    {/* Volume button simulations */}
+                    <div className="absolute -left-[14px] top-32 w-[3px] h-12 bg-slate-700 rounded-l-md z-40"></div>
+                    <div className="absolute -left-[14px] top-48 w-[3px] h-12 bg-slate-700 rounded-l-md z-40"></div>
+                    
+                    {/* Power button simulation */}
+                    <div className="absolute -right-[14px] top-40 w-[3px] h-16 bg-slate-700 rounded-r-md z-40"></div>
+
+                    {/* Simulated Mobile Status bar */}
+                    <div className="bg-[#f8fafc] text-slate-800 px-5 pt-8 pb-1.5 flex justify-between items-center text-[10px] font-bold font-mono tracking-wide z-40 select-none border-b border-gray-100/50">
+                      <span className="text-[#07474e]">
+                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} h
+                      </span>
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <Wifi className="w-3 h-3 text-[#07474e]" />
+                        <span className="text-[8px] font-black bg-[#eefcfd] text-[#07474e] border border-teal-150 px-1 rounded scale-90">5G</span>
+                        <span>94% 🔋</span>
+                      </div>
+                    </div>
+
+                    {/* Screen Content */}
+                    <div className="flex-1 w-full bg-[#f1f5f9] overflow-y-auto max-h-[660px] custom-scrollbar relative">
+                      <div className="sticky top-0 bg-[#07474e] text-white p-3.5 text-center shadow-xs z-30">
+                        <p className="text-[9px] font-mono tracking-widest uppercase text-teal-200">AJ GRUP BCN • SIMULADOR</p>
+                        <h3 className="text-xs font-black tracking-tight leading-none mt-1 uppercase">Fichajes y Partes Diarios</h3>
+                      </div>
+                      
+                      <div className="p-3">
+                        <ParteDiarioForm user={user} forceMobileLayout={true} />
+                      </div>
+                    </div>
+
+                    {/* iOS Indicator Bar */}
+                    <div className="bg-[#f8fafc] py-2 flex items-center justify-center border-t border-gray-150 z-40">
+                      <div className="w-24 h-1 bg-slate-900/60 rounded-full"></div>
+                    </div>
+
+                  </div>
+                </div>
+              ) : (
+                <ParteDiarioForm user={user} forceMobileLayout={false} />
+              )}
+
             </div>
           </div>
         )}

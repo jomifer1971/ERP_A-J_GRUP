@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Obra, InventarioItem } from '../types';
-import { Warehouse, Briefcase, Cpu, FileText, ArrowRightLeft, Plus, Trash2, Camera, ShieldAlert, Sparkles, Check, CheckCircle2, Import } from 'lucide-react';
+import { Obra, InventarioItem, Usuario } from '../types';
+import { Warehouse, Briefcase, Cpu, FileText, ArrowRightLeft, Plus, Trash2, Camera, ShieldAlert, Sparkles, Check, CheckCircle2, Import, Search, Phone, User } from 'lucide-react';
 
 interface AlbaratTemplate {
   empresa: string;
@@ -79,6 +79,86 @@ export default function AlmacenesTab() {
 
   // Global notifications
   const [bannerSuccess, setBannerSuccess] = useState('');
+
+  // Material and Operator finder state
+  const [materialSearchQuery, setMaterialSearchQuery] = useState('');
+
+  const getMaterialSearchResults = () => {
+    if (!materialSearchQuery.trim()) return [];
+    const query = materialSearchQuery.toLowerCase();
+    const results: Array<{
+      articulo: string;
+      cantidad: number;
+      unidad: string;
+      ubicacion: 'central' | { obraId: string; obraNombre: string };
+      operariosActivos: Array<{ id: string; nombre: string; telefono?: string; rol: string }>;
+    }> = [];
+
+    // 1. Search in Central Stock
+    centralStock.forEach(item => {
+      if (item.articulo.toLowerCase().includes(query)) {
+        results.push({
+          articulo: item.articulo,
+          cantidad: item.cantidad,
+          unidad: item.unidad,
+          ubicacion: 'central',
+          operariosActivos: []
+        });
+      }
+    });
+
+    // 2. Search in all virtual stocks
+    const usersRaw = localStorage.getItem('aj_users_v2');
+    const clockingsRaw = localStorage.getItem('aj_fichajes_v2');
+    let allUsers: Usuario[] = [];
+    let allFichajes: any[] = [];
+    try {
+      if (usersRaw) allUsers = JSON.parse(usersRaw);
+      if (clockingsRaw) allFichajes = JSON.parse(clockingsRaw);
+    } catch {}
+
+    Object.keys(virtualStocks).forEach((obraId) => {
+      const items = virtualStocks[obraId] || [];
+      const currentObra = obrasList.find(o => o.id === obraId);
+      const obraNombre = currentObra?.nombre || 'Obra';
+      
+      items.forEach(item => {
+        if (item.articulo.toLowerCase().includes(query)) {
+          const activeOps: Array<{ id: string; nombre: string; telefono?: string; rol: string }> = [];
+          
+          // Sort clockings chronologically
+          const sortedFichajes = [...allFichajes].sort((a,b) => 
+            new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime()
+          );
+
+          allUsers.forEach(u => {
+            const userLogs = sortedFichajes.filter(f => f.operario_id === u.id);
+            if (userLogs.length > 0) {
+              const lastLog = userLogs[userLogs.length - 1];
+              if (lastLog.tipo === 'ENTRADA' && lastLog.obra_id === obraId) {
+                activeOps.push({
+                  id: u.id,
+                  nombre: u.nombre,
+                  telefono: u.telefono,
+                  rol: u.rol === 'jefe_equipo' ? 'Jefe de Equipo' : 'Operario'
+                });
+              }
+            }
+          });
+
+          results.push({
+            articulo: item.articulo,
+            cantidad: item.cantidad,
+            unidad: item.unidad,
+            ubicacion: { obraId, obraNombre },
+            operariosActivos: activeOps
+          });
+        }
+      });
+    });
+
+    return results;
+  };
 
   useEffect(() => {
     // 1. Load active works list in system
@@ -365,6 +445,140 @@ export default function AlmacenesTab() {
           <span>{bannerSuccess}</span>
         </div>
       )}
+
+      {/* SEARCH SYSTEM FOR MATERIALS AND ACTIVE SITE OPERATORS */}
+      <div className="bg-white rounded-3xl p-5 md:p-6 border border-gray-250/80 shadow-sm flex flex-col gap-4 animate-fadeIn">
+        <div className="flex items-center gap-2 border-b pb-3 border-gray-100">
+          <div className="p-2 bg-indigo-50 rounded-xl text-indigo-700 shrink-0">
+            <Search className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-sm font-black font-mono uppercase tracking-wider text-slate-950">🔍 Localizador Inteligente de Materiales y Personal</h2>
+            <p className="text-[11px] text-gray-500 mt-0.5">Busca cualquier material en tiempo real. Te diremos en qué almacén u obra está, y si hay operarios trabajando allí para contactarlos.</p>
+          </div>
+        </div>
+
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={materialSearchQuery}
+            onChange={(e) => setMaterialSearchQuery(e.target.value)}
+            placeholder="Escribe el nombre del artículo para consultar stock global... (ej: Pladur, Cemento, Cable, Split)"
+            className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-gray-250 rounded-2xl text-sm font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all placeholder:text-gray-400"
+          />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          {materialSearchQuery && (
+            <button
+              onClick={() => setMaterialSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 hover:text-gray-600 font-mono bg-gray-100 hover:bg-gray-200 px-2.5 py-1 rounded-lg"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
+
+        {/* Results layout */}
+        {materialSearchQuery.trim() && (
+          <div className="mt-2 flex flex-col gap-3 animate-fadeIn">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black font-mono text-gray-400 uppercase tracking-widest">Resultados de Existencias</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-150 text-indigo-800 font-bold">
+                Coincidencias: {getMaterialSearchResults().length}
+              </span>
+            </div>
+
+            {getMaterialSearchResults().length === 0 ? (
+              <div className="p-8 text-center bg-gray-50 border border-gray-150 rounded-2xl flex flex-col items-center justify-center gap-1.5">
+                <ShieldAlert className="w-6 h-6 text-amber-500 animate-bounce" />
+                <span className="text-xs font-bold text-slate-700">Sin stock registrado del material</span>
+                <span className="text-[11px] text-gray-400 max-w-sm">No hemos encontrado ninguna coincidencia para "{materialSearchQuery}" en el Almacén Central ni en las obras activas.</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[350px] overflow-y-auto pr-1">
+                {getMaterialSearchResults().map((result, index) => (
+                  <div key={index} className="bg-slate-50 border border-gray-200 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-3xs hover:border-indigo-300 transition-colors">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h4 className="text-xs font-black text-slate-900 leading-snug">{result.articulo}</h4>
+                        <span className="text-[10px] font-mono text-gray-400 block mt-0.5">Suministro de construcción</span>
+                      </div>
+                      <span className="text-xs font-black font-mono text-[#07474e] bg-white border px-2.5 py-1 rounded-xl shadow-4xs whitespace-nowrap">
+                        {result.cantidad} {result.unidad}
+                      </span>
+                    </div>
+
+                    <div className="border-t border-gray-200/65 pt-2.5 flex items-center justify-between gap-2.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-500">Ubicación física:</span>
+                      {result.ubicacion === 'central' ? (
+                        <span className="text-[10px] font-extrabold font-mono px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full">
+                          📦 Almacén Central
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-extrabold font-mono px-2 py-0.5 bg-indigo-50 text-indigo-800 border border-indigo-200 rounded-full truncate max-w-[170px]" title={result.ubicacion.obraNombre}>
+                          🏢 Obra: {result.ubicacion.obraNombre}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Operational assistance: Operator present at the obra check */}
+                    {result.ubicacion !== 'central' && (
+                      <div className="mt-1.5 p-3 rounded-xl bg-white border border-gray-200 shadow-4xs flex flex-col gap-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[9px] font-black font-mono text-slate-400 uppercase tracking-widest block">Personal en Obra</span>
+                          {result.operariosActivos.length > 0 ? (
+                            <span className="flex items-center gap-1 text-[9px] font-extrabold font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-150">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                              ACTIVO EN OBRA
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 text-center">
+                              SIN OPERARIOS HOY
+                            </span>
+                          )}
+                        </div>
+
+                        {result.operariosActivos.length > 0 ? (
+                          <div className="flex flex-col gap-2">
+                            {result.operariosActivos.map(op => (
+                              <div key={op.id} className="flex items-center justify-between gap-2.5 p-2 bg-[#f8fafc] border border-gray-150 rounded-lg text-xs font-semibold">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 rounded-full bg-teal-50 border border-teal-250 flex items-center justify-center text-[#07474e] text-[10px] font-black">
+                                    {op.nombre.substring(0,2).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <div className="text-[11px] font-bold text-gray-800 leading-tight">{op.nombre}</div>
+                                    <div className="text-[9px] font-mono text-gray-400 font-medium">{op.rol}</div>
+                                  </div>
+                                </div>
+                                
+                                {op.telefono ? (
+                                  <a
+                                    href={`tel:${op.telefono}`}
+                                    className="flex items-center gap-1 px-2 py-1 bg-[#07474e] hover:bg-[#0b5c65] text-white rounded-lg text-[10px] font-bold font-mono uppercase tracking-wider transition-all no-underline shadow-4xs border-none cursor-pointer"
+                                  >
+                                    <Phone className="w-3 h-3 text-emerald-400" />
+                                    {op.telefono}
+                                  </a>
+                                ) : (
+                                  <span className="text-[9px] font-mono text-gray-400 font-medium">Sin teléfono</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-[10px] font-medium text-gray-400 leading-relaxed font-mono">
+                            ⚠️ Actualmente no hay ningún operario fichado ni registrando parte en la obra "{result.ubicacion.obraNombre}".
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Grid: 1. ALMACÉN CENTRAL & 2. ALMACÉN VIRTUAL POR OBRA */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

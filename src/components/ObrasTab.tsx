@@ -70,7 +70,7 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
         return parsed.map((o: Obra) => {
           const updated = { ...o };
           if (updated.geovalla_activa === undefined) {
-            updated.geovalla_activa = o.id === 'o-1' || o.id === 'o-2';
+            updated.geovalla_activa = true;
           }
           if (!updated.radio) {
             updated.radio = o.id === 'o-2' ? 100 : 150;
@@ -103,8 +103,8 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
     const defaultObras: Obra[] = [
       { id: 'o-1', nombre: 'Reforma Integral Duplex Mallorca', direccion: 'Carrer de Mallorca, 142, BCN', estado: 'EN_CURSO', geovalla_activa: true, latitud: 41.390035, longitud: 2.158145, radio: 150 },
       { id: 'o-2', nombre: 'Instalación Climatización Oficinas Gràcia', direccion: 'Carrer de Verdi, 88, BCN', estado: 'EN_CURSO', geovalla_activa: true, latitud: 41.404285, longitud: 2.157143, radio: 100 },
-      { id: 'o-3', nombre: 'Instalación Eléctrica Nave Poblenou', direccion: 'Carrer de Pallars, 201, BCN', estado: 'EN_CURSO', geovalla_activa: false, latitud: 41.401138, longitud: 2.198357, radio: 200 },
-      { id: 'o-4', nombre: 'Pintura y Suelos Consultorio Médico', direccion: 'Gran Via de les Corts Catalanes, 560, BCN', estado: 'EN_CURSO', geovalla_activa: false, latitud: 41.383122, longitud: 2.161092, radio: 150 }
+      { id: 'o-3', nombre: 'Instalación Eléctrica Nave Poblenou', direccion: 'Carrer de Pallars, 201, BCN', estado: 'EN_CURSO', geovalla_activa: true, latitud: 41.401138, longitud: 2.198357, radio: 200 },
+      { id: 'o-4', nombre: 'Pintura y Suelos Consultorio Médico', direccion: 'Gran Via de les Corts Catalanes, 560, BCN', estado: 'EN_CURSO', geovalla_activa: true, latitud: 41.383122, longitud: 2.161092, radio: 150 }
     ];
     localStorage.setItem('aj_obras_v2', JSON.stringify(defaultObras));
     return defaultObras;
@@ -308,7 +308,7 @@ export default function ObrasTab({ user, onRefreshObras }: ObrasTabProps) {
       nombre: newObraNombre.trim(),
       direccion: addressQuery,
       estado: newObraEstado,
-      geovalla_activa: false,
+      geovalla_activa: true,
       latitud: selectedCoords.lat || 41.385063, // Fallback to Barcelona Centre Catalan coordinates
       longitud: selectedCoords.lon || 2.173403,
       radio: 150

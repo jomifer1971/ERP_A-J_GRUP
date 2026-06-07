@@ -59,6 +59,7 @@ const QUICK_TASK_PHRASES = [
 
 interface ParteDiarioFormProps {
   user?: Usuario | null;
+  forceMobileLayout?: boolean;
 }
 
 function calculateDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -76,7 +77,7 @@ function calculateDistanceInMeters(lat1: number, lon1: number, lat2: number, lon
   return R * c; // returns distance in meters
 }
 
-export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
+export default function ParteDiarioForm({ user, forceMobileLayout = false }: ParteDiarioFormProps) {
   // Resolve activeSession user
   const activeUser = user || (() => {
     const saved = localStorage.getItem('aj_user_session');
@@ -732,7 +733,7 @@ export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
             <WeeklyClockingReport currentUser={activeUser!} />
           </div>
         ) : (
-          <form onSubmit={(e) => { e.preventDefault(); if (activeSubTab === 'parte') handleSubmit(e); }} className="p-6 flex flex-col md:grid md:grid-cols-12 md:gap-8 gap-5 items-start">
+          <form onSubmit={(e) => { e.preventDefault(); if (activeSubTab === 'parte') handleSubmit(e); }} className={`p-6 flex flex-col ${forceMobileLayout ? 'gap-6' : 'md:grid md:grid-cols-12 md:gap-8'} gap-5 items-start w-full`}>
             {formValidationErrors.submit && (
               <div className="col-span-12 p-3 bg-red-50 border border-red-100 text-red-800 rounded-xl text-xs flex items-center gap-2 w-full">
                 <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
@@ -741,7 +742,7 @@ export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
             )}
 
             {/* Columna Izquierda (Selectores de Control y Geovalla) */}
-            <div className="col-span-12 md:col-span-5 flex flex-col gap-5 w-full">
+            <div className={forceMobileLayout ? "flex flex-col gap-5 w-full" : "col-span-12 md:col-span-5 flex flex-col gap-5 w-full"}>
               {/* 1. OPERATOR SELECTOR (Common to both: must know who is acting) */}
               <div className="flex flex-col gap-1.5" id="field-operario">
                 <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
@@ -885,7 +886,7 @@ export default function ParteDiarioForm({ user }: ParteDiarioFormProps) {
             </div>
 
             {/* Columna Derecha (Fichaje o Parte Diario según pestaña) */}
-            <div className="col-span-12 md:col-span-7 flex flex-col gap-5 w-full border-t border-slate-100 pt-5 md:border-t-0 md:pt-0">
+            <div className={forceMobileLayout ? "flex flex-col gap-5 w-full border-t border-slate-100 pt-5" : "col-span-12 md:col-span-7 flex flex-col gap-5 w-full border-t border-slate-100 pt-5 md:border-t-0 md:pt-0"}>
 
           {/* ==================== SUB-TAB 1: FICHAJE DE ENTRADA Y SALIDA ==================== */}
           {activeSubTab === 'fichaje' && (
