@@ -26,7 +26,8 @@ export async function enviarNotificacionReal(
   tipo: 'RETRASO' | 'AUSENCIA' | 'PRUEBA',
   operario: string,
   mensaje: string,
-  obra: string
+  obra: string,
+  bypassActivoCheck: boolean = false
 ): Promise<{ success: boolean; error?: string; detalles?: string }> {
   
   // Load configuration from local storage
@@ -42,7 +43,7 @@ export async function enviarNotificacionReal(
     return { success: false, error: 'Configuración corrupta' };
   }
 
-  if (!config.activo) {
+  if (!config.activo && !bypassActivoCheck) {
     return { success: false, error: 'Notificaciones apagadas' };
   }
 

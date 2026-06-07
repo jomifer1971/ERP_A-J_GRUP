@@ -9,6 +9,7 @@ import { Obra, Usuario, ParteTrabajo, Fichaje } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import WeeklyClockingReport from './WeeklyClockingReport';
 import { enviarNotificacionReal } from '../utils/notificaciones';
+import { auditGpsSpoofing } from '../utils/antiSpoof';
 import { 
   Calendar, 
   Clock, 
@@ -360,6 +361,57 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
             { enableHighAccuracy: true, timeout: 9000 }
           );
         });
+
+        // SHIELD: Run the advanced multi-layered GPS anti-spoofing check
+        setGpsStatusText('Escaneando autenticidad del sensor GPS y firmas de red...');
+        const antiSpoofCheck = await auditGpsSpoofing(coords.latitude, coords.longitude, coords.accuracy);
+        
+        if (antiSpoofCheck.isSpoofed) {
+          setGpsChecking(false);
+          setGpsStatusText('⚠️ ALERTA: Simulación de GPS Detectada');
+          
+          // Log a high priority alert for administration
+          const workerObj = operarios.find(u => u.id === selectedOperarioId) || MOCK_OPERARIOS.find(u => u.id === selectedOperarioId) || { nombre: 'Juan Martínez' };
+          const obraObj = obras.find(ob => ob.id === selectedObraId) || MOCK_OBRAS.find(ob => ob.id === selectedObraId) || { nombre: 'Reforma Integral Duplex Mallorca' };
+          
+          const alertMsg = `⚠️ ADVERTENCIA DE SEGURIDAD: Se ha bloqueado un intento de fichaje simulado por GPS. Razones: ${antiSpoofCheck.reasons.join(' | ')}`;
+          
+          try {
+            const storedAlertsRaw = localStorage.getItem('aj_alertas_fichaje');
+            const storedAlerts = storedAlertsRaw ? JSON.parse(storedAlertsRaw) : [];
+            const secAlert = {
+              id: `sec-${Date.now()}`,
+              tipo: 'AUSENCIA' as const, // Treat spoofing like absence/major issue
+              operario: workerObj.nombre,
+              telefono: '+34 689 123 456',
+              mensaje: alertMsg,
+              fecha_hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+              obra: obraObj.nombre,
+              enviado_sms: true,
+              enviado_telegram: true,
+              leido: false
+            };
+            localStorage.setItem('aj_alertas_fichaje', JSON.stringify([secAlert, ...storedAlerts]));
+            
+            // Dispatch live notification to CEO/Team Leader
+            await enviarNotificacionReal(
+              'AUSENCIA',
+              workerObj.nombre,
+              `⚠️ ALARMA ANTI-FRAUDE: ¡Se ha intentado engañar al GPS! El operario intentó registrar un fichaje con ubicación simulada o falseada (Fake GPS/Simulador) en la obra ${obraObj.nombre}. Intento bloqueado de forma segura.`,
+              obraObj.nombre
+            );
+          } catch (logErr) {
+            console.error('Error logging spoofing security alert:', logErr);
+          }
+
+          if (isEmployee) {
+            const blockMsg = `❌ ACCESO RECHAZADO (Escudo Anti-Fraude): Se han detectado discrepancias en la señal GPS (Simulador o Fake GPS activo). El intento ha sido reportado a Jefatura de Obra.`;
+            setFormValidationErrors({ gps: blockMsg });
+            return;
+          } else {
+            alert(`[Advertencia de Seguridad]: Sistema detecta simulación de GPS (Score: ${antiSpoofCheck.score}/100), pero se omite bloqueo por rol Administrador.`);
+          }
+        }
 
         coordsValue = `${coords.latitude.toFixed(6)},${coords.longitude.toFixed(6)}`;
         const obraLat = currentObra.latitud || 41.385063;

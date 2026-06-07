@@ -177,7 +177,8 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         'PRUEBA',
         user.nombre,
         '¡Genial! Tu pasarela de alertas en tiempo real está correctamente configurada y vinculada a tu teléfono.',
-        'Prueba de Sistemas A&J'
+        'Prueba de Sistemas A&J',
+        true
       );
       if (res.success) {
         setTestResult({ success: true, text: `✓ Mensaje enviado correctamente: ${res.detalles || 'Pasarela activa'}` });
@@ -588,6 +589,98 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                     Enviar Alerta de Prueba al Móvil
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+
+          {/* ESCUDO ANTI-FRAUDE GPS CARD */}
+          <div className="bg-white rounded-3xl p-5 md:p-6 border border-gray-200 flex flex-col gap-4 shadow-sm">
+            <span className="text-xs font-black text-[#0f172a] uppercase tracking-wider font-mono flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 animate-pulse" />
+              Escudo Certificado Anti-Fraude GPS
+            </span>
+            <p className="text-[11px] text-gray-500 leading-relaxed">
+              Sistema de blindaje inteligente que audita la señal entregada por el navegador del operario para certificar la veracidad de la ubicación y bloquear el "fichaje desde el sillón".
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 mt-1 text-[10px]">
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-gray-150 flex flex-col gap-1">
+                <span className="font-bold text-gray-800">📡 Ruido Satelital</span>
+                <span className="text-gray-500 leading-snug">Deniega firmas con precisión fija artificial (e.g. 1.0m o exactamente 10m).</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-gray-150 flex flex-col gap-1">
+                <span className="font-bold text-gray-800">🚫 Bloqueo Emulaciones</span>
+                <span className="text-gray-500 leading-snug">Restringe coordenadas por defecto de simuladores iOS/Android desactivados.</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-gray-150 flex flex-col gap-1">
+                <span className="font-bold text-gray-800">💻 WebDriver Audit</span>
+                <span className="text-gray-500 leading-snug">Detecta proxies de pruebas o scripts automatizados de inyección GPS.</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-gray-150 flex flex-col gap-1">
+                <span className="font-bold text-gray-800">🌐 Consistencia IP</span>
+                <span className="text-gray-500 leading-snug">Contingota la posición IP del operador contra los satélites declarados.</span>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-3 flex flex-col gap-2">
+              <span className="text-[9px] font-bold text-gray-400 font-mono uppercase tracking-wider">Simulación de Ataque (Testing):</span>
+              
+              <button
+                onClick={async () => {
+                  const workerName = "Jordi Vila";
+                  const mockObra = "Reforma Integral Duplex Mallorca";
+                  const mockReasons = ["Coordenadas de Simulador de Desarrollo (Apple Cupertino)", "Entorno automatizado detectado"];
+                  
+                  const alertMsg = `⚠️ ADVERTENCIA DE SEGURIDAD: Se ha bloqueado un intento de fichaje simulado por GPS. Razones: ${mockReasons.join(' | ')}`;
+                  
+                  const newSpoofAlert = {
+                    id: `sec-sim-${Date.now()}`,
+                    tipo: 'AUSENCIA' as any,
+                    operario: workerName,
+                    telefono: '+34 612 841 022',
+                    mensaje: alertMsg,
+                    fecha_hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                    obra: mockObra,
+                    enviado_sms: true,
+                    enviado_telegram: configNotif.activo,
+                    leido: false
+                  };
+
+                  setAlertas(prev => [newSpoofAlert, ...prev]);
+                  
+                  const pushAl: AlertaNotificacion = {
+                    id: `sec-sim-${Date.now()}`,
+                    tipo: 'AUSENCIA',
+                    operario: workerName,
+                    telefono: '+34 612 841 022',
+                    mensaje: `Intento de Spoofing GPS Bloqueado. Discrepancia del sensor detectada en la obra ${mockObra}.`,
+                    fecha_hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                    obra: mockObra,
+                    enviado_sms: true,
+                    enviado_telegram: true,
+                    leido: false
+                  };
+                  setShowActiveMobilePopup(pushAl);
+
+                  if (configNotif.activo) {
+                    try {
+                      await enviarNotificacionReal(
+                        'AUSENCIA',
+                        workerName,
+                        `⚠️ ALARMA ANTI-FRAUDE: ¡Se ha intentado engañar al GPS! El operario intentó registrar un fichaje con ubicación simulada o falseada (Fake GPS/Simulador) en la obra ${mockObra}. Intento bloqueado de forma segura.`,
+                        mockObra
+                      );
+                    } catch (e) {}
+                  }
+
+                  setTimeout(() => {
+                    setShowActiveMobilePopup(null);
+                  }, 8000);
+                }}
+                className="w-full py-2 bg-rose-50 hover:bg-rose-100 border border-rose-250 text-rose-800 font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-700 animate-bounce" />
+                Simular Ataque Spoofing GPS Bloqueado
               </button>
             </div>
           </div>
