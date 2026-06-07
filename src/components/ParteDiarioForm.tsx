@@ -34,9 +34,9 @@ const MOCK_OBRAS: Obra[] = [
 
 // Mock workers for selection fallback (when no Supabase Session is active yet)
 const MOCK_OPERARIOS: Usuario[] = [
-  { id: 'op-1', nombre: 'Juan Martínez', email: 'juan@aygrupbcn.com', rol: 'operario' },
-  { id: 'op-2', nombre: 'Jordi Vila', email: 'jordi@aygrupbcn.com', rol: 'operario' },
-  { id: 'op-3', nombre: 'Andrés Gómez', email: 'andres@aygrupbcn.com', rol: 'operario' }
+  { id: 'op-1', nombre: 'Juan Martínez', email: 'juan@aygrupbcn.com', rol: 'operario', validado: true },
+  { id: 'op-2', nombre: 'Jordi Vila', email: 'jordi@aygrupbcn.com', rol: 'operario', validado: true },
+  { id: 'op-3', nombre: 'Andrés Gómez', email: 'andres@aygrupbcn.com', rol: 'jefe_equipo', validado: true }
 ];
 
 // Popular pre-defined phrases for quick insertion on mobile
@@ -109,11 +109,11 @@ export default function ParteDiarioForm() {
 
         let dbOperarios: Usuario[] = [];
         try {
-          // Attempt loading operarios
+          // Attempt loading operarios and team leads
           const { data, error } = await supabase
             .from('usuarios')
             .select('*')
-            .eq('rol', 'operario');
+            .in('rol', ['operario', 'jefe_equipo']);
           if (!error && data) dbOperarios = data;
         } catch {
           // Swallow subtable errors if user has slightly different structure
@@ -344,15 +344,15 @@ export default function ParteDiarioForm() {
 
       {/* Main Card */}
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden" id="card-parte-diario">
-        <div className="bg-[#1e3a8a] p-6 text-white relative">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500 opacity-15 rounded-full translate-x-8 -translate-y-8"></div>
+        <div className="bg-[#07474e] p-6 text-white relative">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-teal-450 opacity-20 rounded-full translate-x-8 -translate-y-8"></div>
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md">
               <ClipboardList className="w-6 h-6 text-white" />
             </div>
             <div>
               <h2 className="text-xl font-bold tracking-tight">Parte Diario de Trabajo</h2>
-              <p className="text-xs text-blue-100 font-mono tracking-wide uppercase mt-0.5">A&J GRUP BCN • INSTALACIONES</p>
+              <p className="text-xs text-teal-100 font-mono tracking-wide uppercase mt-0.5">A&J GRUP BCN • INSTALACIONES</p>
             </div>
           </div>
         </div>
@@ -368,18 +368,18 @@ export default function ParteDiarioForm() {
           {/* 1. OPERATOR SELECTOR */}
           <div className="flex flex-col gap-1.5" id="field-operario">
             <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[#1e3a8a]" />
+              <User className="w-3.5 h-3.5 text-[#07474e]" />
               Operario Responsable
             </label>
             <div className="relative">
               <select
                 value={selectedOperarioId}
                 onChange={(e) => setSelectedOperarioId(e.target.value)}
-                className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all font-medium text-gray-800"
+                className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
               >
                 {operarios.map((op) => (
                   <option key={op.id} value={op.id}>
-                    {op.nombre} ({op.rol === 'operario' ? 'Operario' : 'Encargado'})
+                    {op.nombre} ({op.rol === 'operario' ? 'Operario' : 'Jefe de Equipo'})
                   </option>
                 ))}
               </select>
@@ -397,14 +397,14 @@ export default function ParteDiarioForm() {
           {/* 2. ACTIVE WORKS */}
           <div className="flex flex-col gap-1.5" id="field-obra">
             <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-              <Briefcase className="w-3.5 h-3.5 text-[#1e3a8a]" />
+              <Briefcase className="w-3.5 h-3.5 text-[#07474e]" />
               Obra Activa
             </label>
             <div className="relative">
               <select
                 value={selectedObraId}
                 onChange={(e) => setSelectedObraId(e.target.value)}
-                className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all font-medium text-gray-800"
+                className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
               >
                 <option value="">-- Selecciona la obra en curso --</option>
                 {obras.map((obra) => (
@@ -430,14 +430,14 @@ export default function ParteDiarioForm() {
             {/* Fecha */}
             <div className="flex flex-col gap-1.5" id="field-fecha">
               <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-[#1e3a8a]" />
+                <Calendar className="w-3.5 h-3.5 text-[#07474e]" />
                 Fecha
               </label>
               <input
                 type="date"
                 value={fecha}
                 onChange={(e) => setFecha(e.target.value)}
-                className="w-full px-4 py-2.5 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all font-medium font-mono text-gray-800"
+                className="w-full px-4 py-2.5 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium font-mono text-gray-800"
               />
               {formValidationErrors.fecha && (
                 <p className="text-[11px] text-red-500 mt-1">
@@ -449,7 +449,7 @@ export default function ParteDiarioForm() {
             {/* Horas */}
             <div className="flex flex-col gap-1.5" id="field-horas">
               <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#1e3a8a]" />
+                <Clock className="w-3.5 h-3.5 text-[#07474e]" />
                 Horas Dedicadas
               </label>
               <div className="flex items-center gap-1">
@@ -468,7 +468,7 @@ export default function ParteDiarioForm() {
                   max="24"
                   value={horas}
                   onChange={(e) => setHoras(Math.max(0.5, Number(e.target.value)))}
-                  className="w-full text-center py-2 bg-[#f8fafc] border border-gray-200 rounded-xl font-mono font-bold text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#1e3a8a]/20"
+                  className="w-full text-center py-2 bg-[#f8fafc] border border-gray-200 rounded-xl font-mono font-bold text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#07474e]/20"
                 />
                 <button
                   type="button"
@@ -486,7 +486,7 @@ export default function ParteDiarioForm() {
                   type="button"
                   onClick={() => setHoras(4)}
                   className={`px-2 py-0.5 text-[10px] rounded-lg font-mono border ${
-                    horas === 4 ? 'bg-[#1e3a8a] border-[#1e3a8a] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
+                    horas === 4 ? 'bg-[#07474e] border-[#07474e] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
                   }`}
                 >
                   4h
@@ -495,7 +495,7 @@ export default function ParteDiarioForm() {
                   type="button"
                   onClick={() => setHoras(8)}
                   className={`px-2 py-0.5 text-[10px] rounded-lg font-mono border ${
-                    horas === 8 ? 'bg-[#1e3a8a] border-[#1e3a8a] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
+                    horas === 8 ? 'bg-[#07474e] border-[#07474e] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
                   }`}
                 >
                   8h
@@ -504,7 +504,7 @@ export default function ParteDiarioForm() {
                   type="button"
                   onClick={() => setHoras(9.5)}
                   className={`px-2 py-0.5 text-[10px] rounded-lg font-mono border ${
-                    horas === 9.5 ? 'bg-[#1e3a8a] border-[#1e3a8a] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
+                    horas === 9.5 ? 'bg-[#07474e] border-[#07474e] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-205 hover:bg-gray-150'
                   }`}
                 >
                   9.5h
@@ -522,7 +522,7 @@ export default function ParteDiarioForm() {
           {/* 4. TASK DESCRIPTION */}
           <div className="flex flex-col gap-1.5" id="field-descripcion">
             <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-[#1e3a8a]" />
+              <FileText className="w-3.5 h-3.5 text-[#07474e]" />
               Tareas Realizadas
             </label>
             <textarea
@@ -530,7 +530,7 @@ export default function ParteDiarioForm() {
               onChange={(e) => setDescripcion(e.target.value)}
               placeholder="Ej: Instalación de tuberías de desagüe, colocación de azulejos en cuarto de baño principal y retirada de escombros..."
               rows={4}
-              className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all font-medium text-gray-800 placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-850 placeholder:text-gray-400"
             />
             {formValidationErrors.descripcion && (
               <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1">
@@ -547,7 +547,7 @@ export default function ParteDiarioForm() {
                     key={idx}
                     type="button"
                     onClick={() => handleQuickPhrase(p)}
-                    className="px-2.5 py-1 text-[10px] bg-[#f8fafc] hover:bg-blue-50 text-gray-600 hover:text-blue-900 rounded-lg text-left border border-gray-200 hover:border-blue-200 transition-colors cursor-pointer truncate max-w-full"
+                    className="px-2.5 py-1 text-[10px] bg-[#f8fafc] hover:bg-teal-50 text-gray-600 hover:text-teal-900 rounded-lg text-left border border-gray-200 hover:border-teal-200 transition-colors cursor-pointer truncate max-w-full"
                   >
                     + {p.replace(/\.$/, '')}
                   </button>
@@ -560,7 +560,7 @@ export default function ParteDiarioForm() {
           <div className="flex flex-col gap-1.5" id="field-materiales">
             <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5 text-[#1e3a8a]" />
+                <Database className="w-3.5 h-3.5 text-[#07474e]" />
                 Materiales Consumidos
               </span>
               <span className="text-[10px] text-gray-400 normal-case italic">Opcional</span>
@@ -570,7 +570,7 @@ export default function ParteDiarioForm() {
               value={materiales}
               onChange={(e) => setMateriales(e.target.value)}
               placeholder="Ej: 3 Sacos de Yeso, 5m tubo cobre 15mm, junta..."
-              className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition-all font-medium text-gray-800"
+              className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
             />
           </div>
 
@@ -579,7 +579,7 @@ export default function ParteDiarioForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#1e3a8a] hover:bg-[#152e72] active:scale-[0.98] disabled:bg-gray-300 text-white font-bold py-3.5 px-6 rounded-2xl shadow-sm text-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer font-sans"
+              className="w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] disabled:bg-gray-300 text-white font-bold py-3.5 px-6 rounded-2xl shadow-sm text-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer font-sans"
             >
               {isSubmitting ? (
                 <>
@@ -627,7 +627,7 @@ export default function ParteDiarioForm() {
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 font-mono uppercase tracking-wide">
-            <ClipboardList className="w-4 h-4 text-[#1e3a8a]" />
+            <ClipboardList className="w-4 h-4 text-[#07474e]" />
             Historial de Hoy ({partesHoy.length})
           </h3>
           {partesHoy.length > 0 && (
@@ -659,7 +659,7 @@ export default function ParteDiarioForm() {
                 className="p-3 bg-[#f8fafc] border border-gray-150 rounded-xl flex flex-col gap-2 relative hover:bg-gray-100/50 transition-colors"
               >
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 bg-blue-50 text-[#1e3a8a] text-[10px] font-bold rounded-md max-w-[190px] truncate">
+                  <span className="px-2 py-0.5 bg-teal-50 text-[#07474e] text-[10px] font-bold rounded-md max-w-[190px] truncate">
                     💼 {getObraName(parte.obra_id)}
                   </span>
                   <span className="text-[10px] font-bold font-mono text-gray-600 bg-white border border-gray-200 px-1.5 py-0.5 rounded-md flex items-center gap-1">

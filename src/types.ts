@@ -7,7 +7,8 @@ export interface Usuario {
   id: string;
   nombre: string;
   email: string;
-  rol: 'operario' | 'administrador' | 'encargado';
+  rol: 'ceo' | 'admin' | 'jefe_equipo' | 'operario';
+  validado: boolean;
 }
 
 export interface Obra {
