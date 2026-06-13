@@ -11,11 +11,11 @@ interface LogoProps {
 }
 
 export default function Logo({ className = "h-12", showText = true }: LogoProps) {
-  // Brand colors matched precisely from the uploaded corporate image:
-  const mainTeal = "#07474e"; // Primary Dark Teal
-  const arrowTeal = "#3b92a3"; // Arrow Accent Teal
-  const textColor = "#07474e"; // "A&J" color (always dark teal)
-  const subtextColor = "#666666"; // "BCN 2025" color (always grey)
+  // Brand colors matched precisely to a Slate Navy and Ice-Blue theme:
+  const mainTeal = "#1e293b"; // Primary Slate Navy
+  const arrowTeal = "#0284c7"; // Arrow Accent Ice-Blue
+  const textColor = "#1e293b"; // "A&J" color (Slate Navy)
+  const subtextColor = "#64748b"; // "BCN 2025" color (Grey-Slate)
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>

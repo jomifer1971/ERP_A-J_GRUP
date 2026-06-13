@@ -311,14 +311,14 @@ export default function OperariosTab({ user }: OperariosTabProps) {
     <div className="flex flex-col gap-6 animate-fadeIn pb-10">
       
       {/* SECTION HEADER CARD */}
-      <div className="bg-gradient-to-r from-[#07474e] to-[#042f34] rounded-3xl p-6 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-teal-500/20 flex items-center justify-center text-teal-300">
+          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-slate-100">
             <Users className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-xl font-extrabold tracking-tight">Gestión del Personal y RGPD</h2>
-            <p className="text-xs text-teal-150 max-w-xl mt-1 leading-normal">
+            <p className="text-xs text-slate-300 max-w-xl mt-1 leading-normal">
               Directorio corporativo y base de datos de operarios de A&J Grup. Permite configurar asignaciones, roles y supervisar el cumplimiento de la directiva de protección de datos personales.
             </p>
           </div>
@@ -326,7 +326,7 @@ export default function OperariosTab({ user }: OperariosTabProps) {
 
         <button
           onClick={handleOpenAdd}
-          className="bg-teal-500 hover:bg-teal-600 text-white font-bold font-mono text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-98 flex items-center gap-2 cursor-pointer self-start md:self-auto"
+          className="bg-slate-700 hover:bg-slate-600 text-white font-bold font-mono text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-98 flex items-center gap-2 cursor-pointer self-start md:self-auto"
         >
           <UserPlus className="w-4 h-4" />
           Registrar Operario
@@ -618,7 +618,7 @@ export default function OperariosTab({ user }: OperariosTabProps) {
 
               {/* LOPD / RGPD MANDATORY BLOCKS (PERSONAL DATA) */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-col gap-3.5 mt-2">
-                <span className="text-[9px] font-black text-[#07474e] uppercase tracking-wider font-mono flex items-center gap-1">
+                <span className="text-[9px] font-black text-slate-800 uppercase tracking-wider font-mono flex items-center gap-1">
                   🛡️ LOPD / Datos Personales Sensibles
                 </span>
 
@@ -697,7 +697,7 @@ export default function OperariosTab({ user }: OperariosTabProps) {
               {/* Submit Buttons */}
               <button
                 type="submit"
-                className="w-full bg-[#07474e] hover:bg-[#093d43] text-white font-extrabold font-mono text-[10px] uppercase tracking-wider py-3 rounded-xl transition-all shadow-sm active:scale-98 cursor-pointer mt-2"
+                className="w-full bg-slate-800 hover:bg-slate-705 text-white font-extrabold font-mono text-[10px] uppercase tracking-wider py-3 rounded-xl transition-all shadow-sm active:scale-98 cursor-pointer mt-2"
               >
                 {isAdding ? 'Crear Registro Seguro ✓' : 'Guardar Ficha en LOPD'}
               </button>

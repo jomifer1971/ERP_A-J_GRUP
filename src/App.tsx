@@ -103,8 +103,8 @@ export default function App() {
             onClick={() => setActiveTab('launcher')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black font-mono uppercase tracking-wider transition-all border cursor-pointer outline-none ${
               activeTab === 'launcher'
-                ? 'bg-[#07474e] text-white border-[#07474e] shadow-2xs'
-                : 'bg-amber-50 text-amber-900 hover:bg-amber-100 border-amber-200'
+                ? 'bg-slate-800 text-white border-slate-800 shadow-2xs'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
             }`}
             title="Ver Panel de Aplicaciones"
           >
@@ -115,11 +115,11 @@ export default function App() {
 
           <div className="text-right hidden sm:block">
             <div className="text-xs font-bold text-[#0f172a] truncate max-w-[150px]">{user.nombre}</div>
-            <div className="text-[10px] font-medium text-[#07474e] font-mono uppercase bg-teal-50 px-1 rounded inline-block">{user.rol}</div>
+            <div className="text-[10px] font-medium text-slate-700 font-mono uppercase bg-slate-100 px-1.5 py-0.5 rounded inline-block">{user.rol}</div>
           </div>
           
           <div className="relative group cursor-pointer flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#f8fafc] border-2 border-[#07474e] overflow-hidden flex items-center justify-center text-[#07474e] shadow-sm">
+            <div className="w-9 h-9 rounded-full bg-[#f8fafc] border-2 border-slate-700 overflow-hidden flex items-center justify-center text-slate-700 shadow-sm">
               <UserIcon className="w-5 h-5" />
             </div>
             <button 
@@ -140,19 +140,19 @@ export default function App() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-full flex items-center justify-between gap-3 p-4 bg-[#07474e] hover:bg-[#0b5c65] text-white rounded-2xl shadow-sm transition-all focus:outline-none cursor-pointer"
+            className="w-full flex items-center justify-between gap-3 p-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl shadow-sm transition-all focus:outline-none cursor-pointer"
           >
             <div className="flex items-center gap-2 text-xs md:text-sm font-black font-mono uppercase tracking-wider">
               {activeTab === 'launcher' && <LayoutGrid className="w-4 h-4 text-amber-400" />}
-              {activeTab === 'dashboard' && <LayoutDashboard className="w-4 h-4 text-emerald-400" />}
-              {activeTab === 'fichaje' && <Clock8 className="w-4 h-4 text-teal-300" />}
+              {activeTab === 'dashboard' && <LayoutDashboard className="w-4 h-4 text-sky-400" />}
+              {activeTab === 'fichaje' && <Clock8 className="w-4 h-4 text-blue-300" />}
               {activeTab === 'informes' && <FileSpreadsheet className="w-4 h-4 text-amber-300 animate-pulse" />}
               {activeTab === 'obras' && <Briefcase className="w-4 h-4 text-amber-400" />}
               {activeTab === 'almacenes' && <Warehouse className="w-4 h-4 text-[#bfdbfe]" />}
-              {activeTab === 'cuenta' && <UserCheck className="w-4 h-4 text-[#99f6e4]" />}
+              {activeTab === 'cuenta' && <UserCheck className="w-4 h-4 text-sky-300" />}
               {activeTab === 'turnos' && <Clock8 className="w-4 h-4 text-indigo-300 animate-pulse" />}
               {activeTab === 'roles' && <ShieldCheck className="w-4 h-4 text-rose-400" />}
-              {activeTab === 'operarios' && <Users className="w-4 h-4 text-teal-400" />}
+              {activeTab === 'operarios' && <Users className="w-4 h-4 text-sky-400" />}
               
               <span>
                 Menú: {
@@ -171,7 +171,7 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-mono font-bold tracking-wide text-teal-100 opacity-90 border border-teal-200/25 px-2 py-0.5 rounded-md bg-white/10 hidden xs:inline-block">
+              <span className="text-[9px] font-mono font-bold tracking-wide text-slate-300 opacity-90 border border-slate-700 px-2 py-0.5 rounded-md bg-white/5 hidden xs:inline-block">
                 {devicePlatform === 'pc' ? 'Click para cambiar' : 'Tocar para cambiar'}
               </span>
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -200,11 +200,11 @@ export default function App() {
                   onClick={() => { setActiveTab('dashboard'); setMobileMenuOpen(false); }}
                   className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                     activeTab === 'dashboard'
-                      ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                      ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                       : 'bg-white text-gray-700 hover:bg-slate-50'
                   }`}
                 >
-                  <LayoutDashboard className="w-4 h-4 text-[#07474e]" />
+                  <LayoutDashboard className="w-4 h-4 text-slate-700" />
                   Mando Central
                 </button>
               )}
@@ -214,11 +214,11 @@ export default function App() {
                 onClick={() => { setActiveTab('fichaje'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                   activeTab === 'fichaje'
-                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                     : 'bg-white text-gray-700 hover:bg-slate-50'
                 }`}
               >
-                <Clock8 className="w-4 h-4 text-teal-600" />
+                <Clock8 className="w-4 h-4 text-slate-600" />
                 Registrar Parte / Fichaje
               </button>
 
@@ -227,11 +227,11 @@ export default function App() {
                 onClick={() => { setActiveTab('informes'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                   activeTab === 'informes'
-                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                     : 'bg-white text-gray-700 hover:bg-slate-50'
                 }`}
               >
-                <FileSpreadsheet className="w-4 h-4 text-amber-600" />
+                <FileSpreadsheet className="w-4 h-4 text-slate-600" />
                 Control e Informes de Horas
               </button>
 
@@ -240,11 +240,11 @@ export default function App() {
                 onClick={() => { setActiveTab('obras'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                   activeTab === 'obras'
-                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                     : 'bg-white text-gray-700 hover:bg-slate-50'
                 }`}
               >
-                <Briefcase className="w-4 h-4 text-amber-600" />
+                <Briefcase className="w-4 h-4 text-slate-600" />
                 Obras y Planos
               </button>
 
@@ -253,11 +253,11 @@ export default function App() {
                 onClick={() => { setActiveTab('almacenes'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                   activeTab === 'almacenes'
-                    ? 'bg-[#07474e]/5 text-[#07474e] border-l-4 border-indigo-600'
+                    ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                     : 'bg-white text-gray-700 hover:bg-slate-50'
                 }`}
               >
-                <Warehouse className="w-4 h-4 text-indigo-600" />
+                <Warehouse className="w-4 h-4 text-slate-600" />
                 Almacenes y OCR
               </button>
 
@@ -266,11 +266,11 @@ export default function App() {
                 onClick={() => { setActiveTab('cuenta'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                   activeTab === 'cuenta'
-                    ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                    ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                     : 'bg-white text-gray-700 hover:bg-slate-50'
                 }`}
               >
-                <UserCheck className="w-4 h-4 text-teal-700" />
+                <UserCheck className="w-4 h-4 text-slate-600" />
                 Ficha y Estadísticas
               </button>
 
@@ -281,11 +281,11 @@ export default function App() {
                     onClick={() => { setActiveTab('turnos'); setMobileMenuOpen(false); }}
                     className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                       activeTab === 'turnos'
-                        ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                        ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                         : 'bg-white text-gray-700 hover:bg-slate-50'
                     }`}
                   >
-                    <Clock8 className="w-4 h-4 text-indigo-700" />
+                    <Clock8 className="w-4 h-4 text-slate-600" />
                     Turnos y Horarios
                   </button>
 
@@ -294,11 +294,11 @@ export default function App() {
                     onClick={() => { setActiveTab('roles'); setMobileMenuOpen(false); }}
                     className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                       activeTab === 'roles'
-                        ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                        ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                         : 'bg-white text-gray-700 hover:bg-slate-50'
                     }`}
                   >
-                    <ShieldCheck className="w-4 h-4 text-rose-600" />
+                    <ShieldCheck className="w-4 h-4 text-slate-600" />
                     Seguridad / Roles
                   </button>
 
@@ -307,11 +307,11 @@ export default function App() {
                     onClick={() => { setActiveTab('operarios'); setMobileMenuOpen(false); }}
                     className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all cursor-pointer ${
                       activeTab === 'operarios'
-                        ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                        ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-700'
                         : 'bg-white text-gray-700 hover:bg-slate-50'
                     }`}
                   >
-                    <Users className="w-4 h-4 text-teal-600" />
+                    <Users className="w-4 h-4 text-slate-600" />
                     Personal y Jefes
                   </button>
                 </>
@@ -476,7 +476,7 @@ export default function App() {
                       {module.descripcion}
                     </p>
 
-                    <div className="flex items-center gap-1 text-[11px] font-mono font-bold uppercase mt-4 text-[#07474e] opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 text-[11px] font-mono font-bold uppercase mt-4 text-slate-800 opacity-0 group-hover:opacity-100 transition-opacity">
                       <span>Acceder</span>
                       <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                     </div>
@@ -504,7 +504,7 @@ export default function App() {
               {/* Control banner for adaptive view */}
               <div className="w-full bg-white rounded-3xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-teal-50 rounded-2xl text-[#07474e] shrink-0">
+                  <div className="p-2.5 bg-slate-100 rounded-2xl text-slate-700 shrink-0">
                     {devicePlatform === 'pc' ? <Monitor className="w-5 h-5" /> : <Smartphone className="w-5 h-5" />}
                   </div>
                   <div>
@@ -531,7 +531,7 @@ export default function App() {
                       onClick={() => setUseMobileViewOnPC(true)}
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         useMobileViewOnPC 
-                          ? 'bg-white shadow-4xs text-[#07474e] border border-slate-250/20' 
+                          ? 'bg-white shadow-4xs text-slate-800 border border-slate-250/20' 
                           : 'text-gray-500 hover:text-gray-800'
                       }`}
                     >
@@ -543,7 +543,7 @@ export default function App() {
                       onClick={() => setUseMobileViewOnPC(false)}
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                         !useMobileViewOnPC
-                          ? 'bg-white shadow-4xs text-[#07474e] border border-slate-250/20'
+                          ? 'bg-white shadow-4xs text-slate-800 border border-slate-250/20'
                           : 'text-gray-500 hover:text-gray-800'
                       }`}
                     >
@@ -556,7 +556,7 @@ export default function App() {
 
               {/* Main title section */}
               <div className="flex flex-col gap-1 items-center text-center">
-                <span className="text-[10px] font-mono font-black text-[#07474e] uppercase tracking-widest leading-none">Portal del Operario</span>
+                <span className="text-[10px] font-mono font-black text-slate-700 uppercase tracking-widest leading-none">Portal del Operario</span>
                 <h2 className="text-2xl font-extrabold text-[#0f172a] tracking-tight">Registro Diario de Trabajo</h2>
                 <p className="text-xs text-[#64748b] leading-relaxed max-w-md mt-1 px-4 text-center">
                   Ficha tu jornada, controla tu posición GPS con geovallado activo y registra materiales instalados en obra de forma ágil.
@@ -584,20 +584,20 @@ export default function App() {
 
                     {/* Simulated Mobile Status bar */}
                     <div className="bg-[#f8fafc] text-slate-800 px-5 pt-8 pb-1.5 flex justify-between items-center text-[10px] font-bold font-mono tracking-wide z-40 select-none border-b border-gray-100/50">
-                      <span className="text-[#07474e]">
+                      <span className="text-slate-800">
                         {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} h
                       </span>
                       <div className="flex items-center gap-1 text-gray-500">
-                        <Wifi className="w-3 h-3 text-[#07474e]" />
-                        <span className="text-[8px] font-black bg-[#eefcfd] text-[#07474e] border border-teal-150 px-1 rounded scale-90">5G</span>
+                        <Wifi className="w-3 h-3 text-slate-800" />
+                        <span className="text-[8px] font-black bg-blue-50 text-slate-800 border border-slate-200 px-1 rounded scale-90">5G</span>
                         <span>94% 🔋</span>
                       </div>
                     </div>
 
                     {/* Screen Content */}
                     <div className="flex-1 w-full bg-[#f1f5f9] overflow-y-auto max-h-[660px] custom-scrollbar relative">
-                      <div className="sticky top-0 bg-[#07474e] text-white p-3.5 text-center shadow-xs z-30">
-                        <p className="text-[9px] font-mono tracking-widest uppercase text-teal-200">AJ GRUP BCN • SIMULADOR</p>
+                      <div className="sticky top-0 bg-slate-800 text-white p-3.5 text-center shadow-xs z-30">
+                        <p className="text-[9px] font-mono tracking-widest uppercase text-slate-350">AJ GRUP BCN • SIMULADOR</p>
                         <h3 className="text-xs font-black tracking-tight leading-none mt-1 uppercase">Fichajes y Partes Diarios</h3>
                       </div>
                       
@@ -652,7 +652,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <p>© {currentYear} A&J GRUP BCN • v2.0 - Responsive Setup</p>
           <div className="flex gap-4">
-            <span className="text-[#07474e] font-bold">REFORMAS INTEGRALES</span>
+            <span className="text-slate-700 font-bold">REFORMAS INTEGRALES</span>
           </div>
         </div>
       </footer>

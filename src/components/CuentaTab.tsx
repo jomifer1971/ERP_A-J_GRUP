@@ -273,7 +273,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
       <div className="bg-white rounded-3xl p-5 md:p-8 shadow-sm border border-gray-200/80">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#07474e]">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-850">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
@@ -283,7 +283,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
           </div>
           
           <div className="px-4 py-2 bg-[#f8fafc] border border-gray-150 rounded-2xl text-[11px] font-semibold text-gray-750 flex items-center gap-1.5 self-start md:self-auto shadow-3xs">
-            <Building className="w-4 h-4 text-[#07474e]" />
+            <Building className="w-4 h-4 text-slate-700" />
             <span>Sede de operaciones: <strong>Barcelona Central</strong></span>
           </div>
         </div>
@@ -312,7 +312,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
               <div className="text-2xl font-black text-gray-950">
                 {totalReportesRealizados}
               </div>
-              <div className="text-[10px] text-[#07474e] font-mono mt-1 font-bold">✔️ 100% Completados</div>
+              <div className="text-[10px] text-slate-705 font-mono mt-1 font-bold">✔️ 100% Completados</div>
             </div>
 
             <div className="bg-white px-4 py-5 rounded-2xl border border-gray-200/90 flex flex-col gap-2">
@@ -329,7 +329,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
           {/* List of justifying docs uploaded */}
           <div className="bg-white rounded-3xl p-5 md:p-6 border border-gray-200 shadow-sm flex flex-col gap-4">
             <h3 className="text-sm font-black font-mono text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b pb-3 border-gray-100">
-              <FileText className="w-4 h-4 text-[#07474e]" />
+              <FileText className="w-4 h-4 text-slate-700" />
               Documentación Médica y Ausencias Modificadas
             </h3>
 
@@ -401,7 +401,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
           
           <div className="bg-white rounded-3xl p-5 md:p-6 border border-gray-200 shadow-sm flex flex-col gap-5">
             <div>
-              <h3 className="text-sm font-black font-mono text-[#07474e] uppercase tracking-wider">Enviar Justificación de Ausencia</h3>
+              <h3 className="text-sm font-black font-mono text-slate-800 uppercase tracking-wider">Enviar Justificación de Ausencia</h3>
               <p className="text-xs text-gray-400 mt-1">Registra aquí citas médicas o bajas para que administración cuadre las nóminas.</p>
             </div>
 
@@ -424,7 +424,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
                 <select
                   value={tipo}
                   onChange={e => setTipo(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-gray-250 rounded-xl text-xs font-bold font-mono text-[#07474e] focus:outline-none focus:border-[#07474e] bg-slate-50/20"
+                  className="w-full px-3 py-2 border border-gray-250 rounded-xl text-xs font-bold font-mono text-slate-800 focus:outline-none focus:border-slate-400 bg-slate-50/20"
                 >
                   <option value="baja_medica">🤒 BAJA MÉDICA (INCAPACIDAD TEMPORAL)</option>
                   <option value="cita_medica">🏥 CITA MÉDICA CAP / ESPECIALISTA</option>
@@ -463,8 +463,8 @@ export default function CuentaTab({ user }: CuentaTabProps) {
                 <textarea
                   value={motivo}
                   onChange={e => setMotivo(e.target.value)}
-                  placeholder="Detalla brevemente el motivo de tu ausencia o el especialista que te atiende..."
-                  className="w-full px-3 py-2.5 border border-gray-250 rounded-xl text-xs text-gray-700 outline-none focus:border-[#07474e] resize-none h-18"
+                  placeholder="Detalla brevemente el motivo de tu ausencia o el specialist que te atiende..."
+                  className="w-full px-3 py-2.5 border border-gray-250 rounded-xl text-xs text-gray-700 outline-none focus:border-slate-400 resize-none h-18"
                   required
                 />
               </div>
@@ -484,7 +484,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
                 <div 
                   className={`border-2 border-dashed rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
                     dragActive 
-                      ? 'border-[#07474e] bg-teal-50/15' 
+                      ? 'border-slate-500 bg-slate-50' 
                       : selectedFileName 
                       ? 'border-emerald-250 bg-emerald-50/5' 
                       : 'border-gray-250 hover:bg-slate-50'
@@ -495,7 +495,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
                   onDrop={handleDrop}
                   onClick={() => document.getElementById('justificante-file-picker')?.click()}
                 >
-                  <Upload className={`w-6 h-6 mb-1.5 ${selectedFileName ? 'text-emerald-600' : 'text-[#07474e]/60'}`} />
+                  <Upload className={`w-6 h-6 mb-1.5 ${selectedFileName ? 'text-emerald-600' : 'text-slate-400'}`} />
                   
                   {selectedFileName ? (
                     <div className="text-xs text-slate-800">
@@ -505,7 +505,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
                     </div>
                   ) : (
                     <div className="text-[11px] text-gray-500 leading-normal">
-                      <span className="font-extrabold text-[#07474e] underline">Haz clic para subir</span> o arrastra tu archivo aquí
+                      <span className="font-extrabold text-slate-800 underline">Haz clic para subir</span> o arrastra tu archivo aquí
                       <p className="text-[9px] text-gray-400 font-mono mt-1">Formatos admitidos: PDF, JPG, PNG (máx. 4MB)</p>
                     </div>
                   )}
@@ -514,7 +514,7 @@ export default function CuentaTab({ user }: CuentaTabProps) {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#07474e] hover:bg-[#0b4e56] text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-sm mt-1"
+                className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-sm mt-1"
               >
                 Enviar a Revisión de Empresa
               </button>

@@ -488,7 +488,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-900 tracking-tight">Registro e Informes de Fichajes</h3>
-              <p className="text-[10px] font-mono uppercase text-[#07474e] font-extrabold tracking-wider leading-none mt-0.5">Control Semanal de Jornada</p>
+              <p className="text-[10px] font-mono uppercase text-slate-850 font-extrabold tracking-wider leading-none mt-0.5">Control Semanal de Jornada</p>
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2 max-w-2xl leading-relaxed">
@@ -506,7 +506,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
           <button
             onClick={handleSendEmail}
             disabled={emailSending}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#07474e] hover:bg-[#0b4e56] disabled:bg-gray-200 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-2xs cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:bg-gray-200 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-2xs cursor-pointer"
           >
             <Mail className="w-4 h-4" />
             {emailSending ? 'Enviando email...' : 'Enviar por Correo'}
@@ -574,14 +574,14 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
                   value={autoRecipients}
                   onChange={handleRecipientsChange}
                   placeholder="ej. gerencia@ajgrup.com, admin@ajgrup.com"
-                  className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-bold font-mono text-[#07474e] placeholder-gray-400 bg-[#f8fafc] border border-gray-200 rounded-lg outline-none focus:ring-1 focus:ring-amber-200 focus:bg-white"
+                  className="flex-1 min-w-0 px-2.5 py-1.5 text-xs font-bold font-mono text-slate-850 placeholder-gray-400 bg-[#f8fafc] border border-gray-200 rounded-lg outline-none focus:ring-1 focus:ring-amber-200 focus:bg-white"
                 />
                 
                 <button
                   type="button"
                   onClick={handleSimulateFridaySend}
                   disabled={simulatingAuto}
-                  className="p-1 px-3 bg-[#07474e] hover:bg-[#0b4e56] disabled:bg-gray-200 text-white text-[10px] font-black font-mono uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap shrink-0"
+                  className="p-1 px-3 bg-slate-850 hover:bg-slate-750 disabled:bg-gray-200 text-white text-[10px] font-black font-mono uppercase tracking-wider rounded-lg transition-all cursor-pointer whitespace-nowrap shrink-0"
                 >
                   {simulatingAuto ? 'Transmitiendo...' : 'Probar Envío'}
                 </button>
@@ -612,7 +612,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
       {/* 2. Interactive KPI Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-slate-50 border border-slate-150 p-4 rounded-2xl flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#07474e] shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-205 flex items-center justify-center text-slate-800 shrink-0">
             <Clock className="w-5 h-5" />
           </div>
           <div>
@@ -658,7 +658,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
             <select
               value={selectedSemana}
               onChange={e => setSelectedSemana(e.target.value)}
-              className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#07474e] font-mono cursor-pointer"
+              className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-slate-350 font-mono cursor-pointer"
             >
               <option value="todas">🗓️ Todas las semanas</option>
               {uniqueWeeks.map(wk => (
@@ -675,7 +675,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
             <select
               value={selectedEmpleado}
               onChange={e => setSelectedEmpleado(e.target.value)}
-              className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#07474e] font-sans cursor-pointer"
+              className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-slate-350 font-sans cursor-pointer"
             >
               <option value="todos">👥 Todos los empleados visibles</option>
               {filteredEmployeesList.map(emp => (
@@ -692,7 +692,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
             <select
               value={selectedObra}
               onChange={e => setSelectedObra(e.target.value)}
-              className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#07474e] font-sans cursor-pointer"
+              className="w-full px-3 py-2 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-slate-350 font-sans cursor-pointer"
             >
               <option value="todas">🏗️ Todas las obras activas</option>
               {obras.map(o => (
@@ -726,8 +726,8 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     {/* Week representation Badge */}
-                    <div className="p-3 rounded-xl bg-[#07474e]/5 border border-[#07474e]/10 flex flex-col items-center justify-center min-w-[100px] text-center">
-                      <span className="text-[10px] font-bold font-mono text-[#07474e] tracking-wider uppercase leading-none">Semana</span>
+                    <div className="p-3 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center min-w-[100px] text-center">
+                      <span className="text-[10px] font-bold font-mono text-slate-800 tracking-wider uppercase leading-none">Semana</span>
                       <span className="text-[11px] font-extrabold text-teal-900 mt-1.5 leading-none">
                         {row.semanaLabel.split('Semana del ')[1]?.substring(0, 11) || 'Fichaje'}
                       </span>
@@ -746,7 +746,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
                       
                       <div className="flex flex-col gap-1 font-mono text-[11px] text-gray-500">
                         <div className="flex items-center gap-1.5">
-                          <Briefcase className="w-3.5 h-3.5 text-[#07474e] shrink-0" />
+                          <Briefcase className="w-3.5 h-3.5 text-slate-800 shrink-0" />
                           <span className="font-semibold text-gray-700 leading-none">{row.obraNombre}</span>
                         </div>
                         <div className="flex items-center gap-1.5 mt-0.5">
@@ -781,7 +781,7 @@ export default function WeeklyClockingReport({ currentUser }: WeeklyClockingRepo
                     <div className="flex flex-col items-end shrink-0">
                       <span className="text-[10px] font-mono font-black text-gray-400 uppercase tracking-widest leading-none">TOTAL SEMANAL</span>
                       <div className="text-2xl font-black text-gray-800 font-mono mt-1 leading-none">
-                        {row.horasTotales} <span className="text-xs font-bold text-[#07474e]">horas</span>
+                        {row.horasTotales} <span className="text-xs font-bold text-slate-800">horas</span>
                       </div>
                     </div>
                   </div>

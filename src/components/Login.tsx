@@ -200,18 +200,18 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f1f5f9] flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+    <div className="min-h-screen bg-[#f4f6f9] flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-150 overflow-hidden">
         
         {/* Header decoration on a light background to preserve original logo branding colors */}
-        <div className="bg-[#f8fafc] border-b border-gray-100 px-8 pt-10 pb-10 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#3b92a3]/5 rounded-full translate-x-12 -translate-y-12 animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#07474e]/5 rounded-full -translate-x-8 translate-y-8"></div>
+        <div className="bg-[#f8fafc] border-b border-slate-100 px-8 pt-10 pb-10 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-slate-300/10 rounded-full translate-x-12 -translate-y-12 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-slate-400/5 rounded-full -translate-x-8 translate-y-8"></div>
           
           <div className="relative z-10 flex flex-col items-center">
             {/* Logo scaled up for magnificent visibility with original branding colors */}
             <Logo className="h-20 md:h-24 w-auto transform hover:scale-105 transition-transform duration-300" showText={true} />
-            <p className="text-[#07474e]/60 text-[10px] tracking-widest font-mono font-bold uppercase mt-4">MANAGEMENT PORTAL</p>
+            <p className="text-slate-500/80 text-[10px] tracking-widest font-mono font-bold uppercase mt-4">MANAGEMENT PORTAL</p>
           </div>
         </div>
 
@@ -219,7 +219,7 @@ export default function Login({ onLogin }: LoginProps) {
         <div className="px-8 py-8 bg-white relative z-20">
           {activeView === 'login' && (
             <>
-              <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                 Iniciar Sesión
               </h2>
 
@@ -235,7 +235,7 @@ export default function Login({ onLogin }: LoginProps) {
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all text-sm font-medium"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all text-sm font-medium"
                       placeholder="ejemplo@ajgrup.com"
                     />
                   </div>
@@ -252,7 +252,7 @@ export default function Login({ onLogin }: LoginProps) {
                         setRecoverySuccess(false);
                         setRecoveryError('');
                       }}
-                      className="text-xs font-bold text-[#07474e] hover:text-[#3b92a3] hover:underline focus:outline-none"
+                      className="text-xs font-bold text-slate-800 hover:text-blue-600 hover:underline focus:outline-none"
                     >
                       ¿Contraseña olvidada?
                     </button>
@@ -265,7 +265,7 @@ export default function Login({ onLogin }: LoginProps) {
                       type="password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all text-sm font-medium"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all text-sm font-medium"
                       placeholder="••••••••"
                     />
                   </div>
@@ -281,7 +281,7 @@ export default function Login({ onLogin }: LoginProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-4 w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans cursor-pointer"
+                  className="mt-4 w-full bg-slate-800 hover:bg-slate-700 active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans cursor-pointer"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -309,7 +309,7 @@ export default function Login({ onLogin }: LoginProps) {
                       setRegPassword('');
                       setRegEspecialidades([]);
                     }}
-                    className="font-bold text-[#07474e] hover:text-[#0b4e56] hover:underline cursor-pointer"
+                    className="font-bold text-slate-800 hover:text-blue-600 hover:underline cursor-pointer"
                   >
                     Regístrate aquí
                   </button>
@@ -340,9 +340,9 @@ export default function Login({ onLogin }: LoginProps) {
               </p>
 
               {recoverySuccess ? (
-                <div className="bg-teal-50 border border-teal-100 p-5 rounded-2xl flex flex-col gap-3 my-2">
-                  <div className="text-xs text-teal-850 font-medium leading-relaxed">
-                    <span className="font-bold text-teal-900 block mb-1">¡Correo enviado con éxito!</span>
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col gap-3 my-2">
+                  <div className="text-xs text-slate-700 font-medium leading-relaxed">
+                    <span className="font-bold text-slate-900 block mb-1">¡Correo enviado con éxito!</span>
                     Hemos enviado instrucciones para restablecer tu contraseña a <strong className="font-semibold block mt-0.5">{recoveryEmail}</strong>. Por favor, revisa tu bandeja de entrada o carpeta de spam.
                   </div>
                   <button
@@ -350,7 +350,7 @@ export default function Login({ onLogin }: LoginProps) {
                       setActiveView('login');
                       setRecoverySuccess(false);
                     }}
-                    className="mt-2 text-center text-xs font-bold text-[#07474e] hover:underline cursor-pointer"
+                    className="mt-2 text-center text-xs font-bold text-slate-800 hover:underline cursor-pointer"
                   >
                     Volver al inicio de sesión
                   </button>
@@ -367,7 +367,7 @@ export default function Login({ onLogin }: LoginProps) {
                         type="email"
                         value={recoveryEmail}
                         onChange={e => setRecoveryEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all text-sm font-medium"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all text-sm font-medium"
                         placeholder="ejemplo@ajgrup.com"
                       />
                     </div>
@@ -384,7 +384,7 @@ export default function Login({ onLogin }: LoginProps) {
                     <button
                       type="submit"
                       disabled={recoveryLoading}
-                      className="w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-sm cursor-pointer"
+                      className="w-full bg-slate-800 hover:bg-slate-700 active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-sm cursor-pointer"
                     >
                       {recoveryLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -440,7 +440,7 @@ export default function Login({ onLogin }: LoginProps) {
                       setActiveView('login');
                       setRegSuccess(false);
                     }}
-                    className="w-full py-3 bg-[#07474e] hover:bg-[#0b5c65] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all font-mono mt-2 shadow-sm cursor-pointer"
+                    className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all font-mono mt-2 shadow-sm cursor-pointer"
                   >
                     Volver al inicio de sesión
                   </button>
@@ -460,7 +460,7 @@ export default function Login({ onLogin }: LoginProps) {
                         required
                         value={regNombre}
                         onChange={e => setRegNombre(e.target.value)}
-                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all font-medium"
                         placeholder="Ej. Manuel García López"
                       />
                     </div>
@@ -472,7 +472,7 @@ export default function Login({ onLogin }: LoginProps) {
                         required
                         value={regEmail}
                         onChange={e => setRegEmail(e.target.value)}
-                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all font-medium"
                         placeholder="Ej. manuel@ajgrup.com o personal"
                       />
                     </div>
@@ -484,7 +484,7 @@ export default function Login({ onLogin }: LoginProps) {
                         required
                         value={regTelefono}
                         onChange={e => setRegTelefono(e.target.value)}
-                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all font-medium"
                         placeholder="Ej. +34 600 000 000"
                       />
                     </div>
@@ -497,8 +497,8 @@ export default function Login({ onLogin }: LoginProps) {
                           onClick={() => setRegRol('operario')}
                           className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                             regRol === 'operario'
-                              ? 'bg-[#07474e] text-white border-[#07474e]'
-                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                              ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           🛠️ Operario
@@ -508,8 +508,8 @@ export default function Login({ onLogin }: LoginProps) {
                           onClick={() => setRegRol('jefe_equipo')}
                           className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                             regRol === 'jefe_equipo'
-                              ? 'bg-[#07474e] text-white border-[#07474e]'
-                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                              ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           👷‍♂️ Jefe de Equipo
@@ -524,7 +524,7 @@ export default function Login({ onLogin }: LoginProps) {
                         required
                         value={regPassword}
                         onChange={e => setRegPassword(e.target.value)}
-                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800/20 focus:border-slate-800 transition-all font-medium"
                         placeholder="Mínimo 4 caracteres"
                       />
                     </div>
@@ -541,8 +541,8 @@ export default function Login({ onLogin }: LoginProps) {
                               onClick={() => toggleEspecialidad(esp)}
                               className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer capitalize ${
                                 active
-                                  ? 'bg-[#07474e]/10 text-[#07474e] border-[#07474e]/30'
-                                  : 'bg-white text-gray-650 border-gray-200 hover:bg-slate-50'
+                                  ? 'bg-slate-100 text-slate-800 border-slate-300 shadow-3xs'
+                                  : 'bg-white text-gray-600 border-gray-200 hover:bg-slate-50'
                               }`}
                             >
                               {esp}
@@ -563,7 +563,7 @@ export default function Login({ onLogin }: LoginProps) {
                       <button
                         type="submit"
                         disabled={regLoading}
-                        className="w-full py-3 bg-[#07474e] hover:bg-[#0b5c65] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all font-mono shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all font-mono shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                       >
                         {regLoading ? (
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

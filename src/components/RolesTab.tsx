@@ -280,7 +280,7 @@ export default function RolesTab({ user }: RolesTabProps) {
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#07474e] hover:bg-[#0b4e56] text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all self-start md:self-center"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all self-start md:self-center"
         >
           <UserPlus className="w-4 h-4" />
           {isAdding ? 'CANCELAR' : 'Añadir Empleado'}
@@ -313,7 +313,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                 value={newUserNombre}
                 onChange={e => setNewUserNombre(e.target.value)}
                 placeholder="Ej. Pedro Picapiedra"
-                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#07474e]"
+                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:border-slate-400"
                 required
               />
             </div>
@@ -325,7 +325,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                 value={newUserEmail}
                 onChange={e => setNewUserEmail(e.target.value)}
                 placeholder="pedro@ajgrup.com"
-                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-[#07474e]"
+                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-slate-400"
                 required
               />
             </div>
@@ -337,7 +337,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                 value={newUserTelefono}
                 onChange={e => setNewUserTelefono(e.target.value)}
                 placeholder="+34 600 000 000"
-                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-[#07474e]"
+                className="w-full px-3.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-mono text-gray-800 focus:outline-none focus:border-slate-400"
               />
             </div>
 
@@ -346,7 +346,7 @@ export default function RolesTab({ user }: RolesTabProps) {
               <select
                 value={newUserRol}
                 onChange={e => setNewUserRol(e.target.value as any)}
-                className="w-full px-2.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-bold text-[#07474e] font-mono focus:outline-none focus:border-[#07474e]"
+                className="w-full px-2.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-bold text-slate-800 font-mono focus:outline-none focus:border-slate-405"
               >
                 <option value="operario">👨‍🔧 OPERARIO</option>
                 <option value="jefe_equipo">👷 JEFE DE EQUIPO</option>
@@ -361,7 +361,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                 value={newUserJefeId}
                 onChange={e => setNewUserJefeId(e.target.value)}
                 disabled={newUserRol !== 'operario'}
-                className="w-full px-2.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-bold text-gray-700 font-mono focus:outline-none focus:border-[#07474e] disabled:opacity-50"
+                className="w-full px-2.5 py-2.5 bg-white border border-gray-250 rounded-xl text-xs font-bold text-gray-700 font-mono focus:outline-none focus:border-slate-400 disabled:opacity-50"
               >
                 <option value="">-- Sin Jefe --</option>
                 {usuarios.filter(lead => lead.rol === 'jefe_equipo').map(lead => (
@@ -412,7 +412,7 @@ export default function RolesTab({ user }: RolesTabProps) {
           <div className="flex justify-end mt-1">
             <button 
               type="submit"
-              className="px-6 py-2.5 bg-[#07474e] hover:bg-[#07474e]/90 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-xs"
+              className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-xs"
             >
               Guardar Nuevo Empleado
             </button>
@@ -457,7 +457,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black font-mono border ${
                           u.validado 
-                            ? 'bg-teal-50 text-[#07474e] border-teal-200' 
+                            ? 'bg-slate-50 text-slate-805 border-slate-200' 
                             : 'bg-red-50 text-red-600 border-red-200'
                         }`}>
                           {u.nombre.substring(0, 2).toUpperCase()}
@@ -466,7 +466,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                           <div className="text-xs font-extrabold text-gray-800">{u.nombre}</div>
                           <div className="text-[10px] font-mono text-gray-400 mt-0.5">{u.email}</div>
                           {u.telefono && (
-                            <div className="text-[9px] font-mono font-bold text-[#07474e] mt-1 bg-teal-50 px-1.5 py-0.5 rounded inline-block">📞 {u.telefono}</div>
+                            <div className="text-[9px] font-mono font-bold text-slate-800 mt-1 bg-slate-50 px-1.5 py-0.5 rounded inline-block">📞 {u.telefono}</div>
                           )}
                         </div>
                       </div>
@@ -475,14 +475,14 @@ export default function RolesTab({ user }: RolesTabProps) {
                     {/* Role selector */}
                     <td className="p-4">
                       {isMaestro ? (
-                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-black font-mono bg-[#07474e] text-white uppercase border border-[#07474e] shadow-xs">
+                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-black font-mono bg-slate-800 text-white uppercase border border-slate-800 shadow-xs">
                           {u.rol === 'ceo' ? '👑 FUNDADOR / CEO' : '⚙️ ADMIN MAESTRO'}
                         </span>
                       ) : (
                         <select
                            value={u.rol}
                            onChange={(e) => handleChangeRole(u.id, e.target.value as any)}
-                           className="px-2 py-1.5 border border-gray-200 rounded-lg text-[11px] font-bold font-mono text-[#07474e] bg-white outline-none focus:ring-1 focus:ring-teal-100"
+                           className="px-2 py-1.5 border border-gray-200 rounded-lg text-[11px] font-bold font-mono text-slate-800 bg-white outline-none focus:ring-1 focus:ring-slate-100"
                         >
                           <option value="operario">👨‍🔧 OPERARIO</option>
                           <option value="jefe_equipo">👷 JEFE DE EQUIPO</option>
@@ -525,7 +525,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                           <button
                             type="button"
                             onClick={() => setEditingUserSpecialties(null)}
-                            className="mt-1 bg-[#07474e] hover:bg-[#0b4e56] text-white text-[9px] py-1.5 px-2 rounded-lg font-black font-mono uppercase tracking-wider transition-all text-center cursor-pointer"
+                            className="mt-1 bg-slate-800 hover:bg-slate-700 text-white text-[9px] py-1.5 px-2 rounded-lg font-black font-mono uppercase tracking-wider transition-all text-center cursor-pointer"
                           >
                             Listo
                           </button>
@@ -547,7 +547,7 @@ export default function RolesTab({ user }: RolesTabProps) {
                           <button
                             type="button"
                             onClick={() => setEditingUserSpecialties(u.id)}
-                            className="ml-1.5 text-[9px] text-[#07474e] hover:text-[#0b4e56] font-bold underline font-mono cursor-pointer shrink-0"
+                            className="ml-1.5 text-[9px] text-slate-800 hover:text-slate-700 font-bold underline font-mono cursor-pointer shrink-0"
                           >
                             (Editar)
                           </button>

@@ -244,7 +244,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-bold text-[#0f172a] tracking-tight">Panel de Administración</h2>
           <p className="text-sm text-[#64748b]">
-            Bienvenido, {user.nombre}. Nivel de acceso: <span className="font-mono font-bold uppercase text-[#07474e] bg-teal-50 px-1.5 py-0.5 rounded">{user.rol.replace('_', ' ')}</span>
+            Bienvenido, {user.nombre}. Nivel de acceso: <span className="font-mono font-bold uppercase text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded">{user.rol.replace('_', ' ')}</span>
           </p>
         </div>
 
@@ -260,7 +260,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Quick Stats */}
         <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-50 text-[#07474e] rounded-xl flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-100 text-slate-800 rounded-xl flex items-center justify-center shrink-0">
             <FileText className="w-5 h-5 md:w-6 md:h-6" />
           </div>
           <div>
@@ -522,7 +522,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
             <div className="flex flex-col gap-3">
               {/* Telegram config fields */}
               <div className="bg-slate-50 p-3 rounded-2xl border border-gray-150 flex flex-col gap-2.5">
-                <span className="text-[10px] font-bold text-[#07474e] uppercase tracking-wide flex items-center gap-1 font-mono">
+                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1 font-mono">
                   📱 Canal Telegram (Gratuito e Instantáneo)
                 </span>
                 
@@ -553,7 +553,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
 
               {/* Webhook URL config fields */}
               <div className="bg-slate-50 p-3 rounded-2xl border border-gray-150 flex flex-col gap-2.5">
-                <span className="text-[10px] font-bold text-[#07474e] uppercase tracking-wide flex items-center gap-1 font-mono">
+                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1 font-mono">
                   🔗 Webhook Universal (Zapier, Make, Twilio)
                 </span>
                 
@@ -590,7 +590,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                     ? 'bg-gray-150 text-gray-400 border border-gray-200' 
                     : (!configNotif.telegramToken && !configNotif.webhookUrl)
                       ? 'bg-gray-50 text-gray-300 border border-gray-200 cursor-not-allowed'
-                      : 'bg-[#07474e] hover:bg-[#0b4e56] text-white shadow-sm'
+                      : 'bg-slate-800 hover:bg-slate-700 text-white shadow-sm'
                 }`}
               >
                 {isTesting ? (
@@ -727,7 +727,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                     <div className="text-xs text-gray-500 font-mono mt-0.5">{u.email} • {u.rol}</div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => removeUser(u.id)} className="flex-1 sm:flex-none px-4 py-2 bg-[#07474e] hover:bg-[#0b4e56] text-white text-xs font-bold rounded-xl transition-colors active:scale-95 cursor-pointer">Aprobar</button>
+                    <button onClick={() => removeUser(u.id)} className="flex-1 sm:flex-none px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition-colors active:scale-95 cursor-pointer">Aprobar</button>
                     <button onClick={() => removeUser(u.id)} className="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-300 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-100 transition-colors active:scale-95 cursor-pointer">Rechazar</button>
                   </div>
                 </div>
@@ -739,7 +739,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
         {/* Global Recent Activity */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-5 md:p-6 flex flex-col gap-4">
           <h3 className="text-sm font-bold text-[#0f172a] font-mono uppercase tracking-wide flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#07474e]" />
+            <FileText className="w-4 h-4 text-slate-800" />
             Actividad Global Hoy
           </h3>
           <p className="text-xs text-gray-500">Últimos partes de trabajo centralizados.</p>
@@ -747,7 +747,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
           <div className="flex flex-col gap-3">
              <div className="border border-gray-150 bg-gray-50/50 rounded-xl p-4 flex flex-col gap-2.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 bg-[#07474e]/5 text-[#07474e] text-[10px] font-bold rounded-lg truncate max-w-[200px]">Reforma Integral Duplex Mallorca</span>
+                  <span className="px-2.5 py-1 bg-slate-100 text-slate-800 text-[10px] font-bold rounded-lg truncate max-w-[200px]">Reforma Integral Duplex Mallorca</span>
                   <span className="text-[10px] font-bold font-mono text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded-lg">8 h</span>
                 </div>
                 <p className="text-xs text-gray-700 leading-relaxed">Demolición y limpieza general de tabiquería pesada.</p>
@@ -759,7 +759,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
              
              <div className="border border-gray-150 bg-gray-50/50 rounded-xl p-4 flex flex-col gap-2.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 bg-[#07474e]/5 text-[#07474e] text-[10px] font-bold rounded-lg truncate max-w-[200px]">Pintura y Suelos Consultorio</span>
+                  <span className="px-2.5 py-1 bg-slate-100 text-slate-800 text-[10px] font-bold rounded-lg truncate max-w-[200px]">Pintura y Suelos Consultorio</span>
                   <span className="text-[10px] font-bold font-mono text-gray-600 bg-white border border-gray-200 px-2 py-1 rounded-lg">9.5 h</span>
                 </div>
                 <p className="text-xs text-gray-700 leading-relaxed">Alisado de paredes y remate de esquinas. Colocación de perfilería y acabados.</p>

@@ -784,7 +784,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
       
       {/* Main Card */}
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden" id="card-parte-diario">
-        <div className="bg-[#07474e] p-6 text-white relative">
+        <div className="bg-slate-800 p-6 text-white relative">
           <div className="absolute top-0 right-0 w-24 h-24 bg-teal-450 opacity-20 rounded-full translate-x-8 -translate-y-8"></div>
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md">
@@ -817,11 +817,11 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-1 text-xs font-mono font-bold uppercase transition-all rounded-xl cursor-pointer ${
               activeSubTab === 'fichaje'
-                ? 'bg-white text-[#07474e] shadow-xs border border-gray-200'
+                ? 'bg-white text-slate-800 shadow-xs border border-gray-200'
                 : 'text-gray-500 hover:text-gray-800'
             }`}
           >
-            <Clock className="w-3.5 h-3.5 text-[#07474e]" />
+            <Clock className="w-3.5 h-3.5 text-slate-800" />
             1. Entrada / Salida
           </button>
           <button
@@ -832,11 +832,11 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-1 text-xs font-mono font-bold uppercase transition-all rounded-xl cursor-pointer ${
               activeSubTab === 'parte'
-                ? 'bg-white text-[#07474e] shadow-xs border border-gray-200'
+                ? 'bg-white text-slate-800 shadow-xs border border-gray-200'
                 : 'text-gray-500 hover:text-gray-800'
             }`}
           >
-            <FileText className="w-3.5 h-3.5 text-[#07474e]" />
+            <FileText className="w-3.5 h-3.5 text-slate-800" />
             2. Parte Diario
           </button>
 
@@ -850,11 +850,11 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
               }}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-1 text-xs font-mono font-bold uppercase transition-all rounded-xl cursor-pointer ${
                 activeSubTab === 'informe'
-                  ? 'bg-amber-100 text-[#07474e] shadow-xs border border-amber-200'
-                  : 'text-gray-500 hover:text-[#07474e]'
+                  ? 'bg-amber-100 text-slate-800 shadow-xs border border-amber-200'
+                  : 'text-gray-500 hover:text-slate-800'
               }`}
             >
-              <Calendar className="w-3.5 h-3.5 text-[#07474e]" />
+              <Calendar className="w-3.5 h-3.5 text-slate-800" />
               3. Informe Semanal
             </button>
           )}
@@ -878,14 +878,14 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
               {/* 1. OPERATOR SELECTOR (Common to both: must know who is acting) */}
               <div className="flex flex-col gap-1.5" id="field-operario">
                 <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-[#07474e]" />
+                  <User className="w-3.5 h-3.5 text-slate-800" />
                   Operario Responsable
                 </label>
                 <div className="relative">
                   <select
                     value={selectedOperarioId}
                     onChange={(e) => setSelectedOperarioId(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-gray-800"
                   >
                     {operarios.map((op) => {
                       const tradesStr = op.especialidades && op.especialidades.length > 0
@@ -912,14 +912,14 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
               {/* 2. ACTIVE WORKS (Common to both: determines geofencing and reported workspace) */}
               <div className="flex flex-col gap-1.5" id="field-obra">
                 <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-[#07474e]" />
+                  <Briefcase className="w-3.5 h-3.5 text-slate-800" />
                   Obra Activa
                 </label>
                 <div className="relative">
                   <select
                     value={selectedObraId}
                     onChange={(e) => setSelectedObraId(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm appearance-none outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-gray-800"
                   >
                     <option value="">-- Selecciona la obra en curso --</option>
                     {obras.map((obra) => (
@@ -945,13 +945,13 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
 
                   if (selectedObra.geovalla_activa) {
                     return (
-                      <div className="mt-2.5 p-3 rounded-2xl bg-teal-50/55 border border-teal-100 flex flex-col gap-2 animate-fadeIn">
+                      <div className="mt-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2 animate-fadeIn">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-1.5">
-                            <Shield className="w-3.5 h-3.5 text-[#07474e] shrink-0" />
-                            <span className="text-[11px] font-black font-mono uppercase tracking-wider text-[#07474e]">Geovalla Activa</span>
+                            <Shield className="w-3.5 h-3.5 text-slate-800 shrink-0" />
+                            <span className="text-[11px] font-black font-mono uppercase tracking-wider text-slate-800">Geovalla Activa</span>
                           </div>
-                          <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded-full bg-teal-100 text-[#07474e] border border-teal-200">
+                          <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-200">
                             Rango: {selectedObra.radio || 150}m
                           </span>
                         </div>
@@ -962,9 +962,9 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
 
                         {/* GPS checking state spinner */}
                         {gpsChecking && (
-                          <div className="flex items-center gap-2 py-1.5 px-2 bg-white rounded-xl border border-teal-100 shadow-xs animate-pulse">
-                            <div className="w-3 h-3 border-2 border-[#07474e] border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-[10px] font-mono font-bold text-[#07474e]">{gpsStatusText}</span>
+                          <div className="flex items-center gap-2 py-1.5 px-2 bg-white rounded-xl border border-slate-200 shadow-xs animate-pulse">
+                            <div className="w-3 h-3 border-2 border-slate-805 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-[10px] font-mono font-bold text-slate-805">{gpsStatusText}</span>
                           </div>
                         )}
 
@@ -1032,7 +1032,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                 <button
                   type="button"
                   onClick={() => setActiveSubTab('informe')}
-                  className="mt-4 px-4 py-2.5 bg-[#07474e] hover:bg-[#0b4e56] text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-3xs cursor-pointer"
+                  className="mt-4 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-3xs cursor-pointer"
                 >
                   Ver Informe Semanal de Operarios
                 </button>
@@ -1166,7 +1166,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                 return (
                   <div className="p-3 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-between gap-3 animate-fadeIn">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-[#07474e] shrink-0 animate-pulse" />
+                      <Clock className="w-4 h-4 text-slate-808 shrink-0 animate-pulse" />
                       <span className="text-xs text-gray-700 leading-tight">
                         Has fichado <strong>{clockedHours} h</strong> hoy en obra. ¿Cargar al parte?
                       </span>
@@ -1176,7 +1176,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                       onClick={() => {
                         setHoras(clockedHours);
                       }}
-                      className="shrink-0 text-[10px] font-mono font-bold bg-[#07474e] hover:bg-[#0b4e56] text-white px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                      className="shrink-0 text-[10px] font-mono font-bold bg-slate-800 hover:bg-slate-750 text-white px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
                     >
                       COPIAR
                     </button>
@@ -1189,14 +1189,14 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                 {/* Fecha */}
                 <div className="flex flex-col gap-1.5" id="field-fecha">
                   <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#07474e]" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-808" />
                     Fecha del Trabajo
                   </label>
                   <input
                     type="date"
                     value={fecha}
                     onChange={(e) => setFecha(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium font-mono text-gray-800"
+                    className="w-full px-4 py-2.5 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-slate-550/20 focus:border-slate-550 transition-all font-medium font-mono text-gray-800"
                   />
                   {formValidationErrors.fecha && (
                     <p className="text-[11px] text-red-500 mt-1">
@@ -1208,7 +1208,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                 {/* Horas */}
                 <div className="flex flex-col gap-1.5" id="field-horas">
                   <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[#07474e]" />
+                    <Clock className="w-3.5 h-3.5 text-slate-808" />
                     Horas Dedicadas
                   </label>
                   <div className="flex items-center gap-1">
@@ -1226,7 +1226,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                       max="24"
                       value={horas}
                       onChange={(e) => setHoras(Math.max(0.5, Number(e.target.value)))}
-                      className="w-full text-center py-1.5 bg-[#f8fafc] border border-gray-200 rounded-lg font-mono font-bold text-sm text-gray-850 outline-none focus:ring-2 focus:ring-[#07474e]/20"
+                      className="w-full text-center py-1.5 bg-[#f8fafc] border border-gray-200 rounded-lg font-mono font-bold text-sm text-gray-850 outline-none focus:ring-2 focus:ring-slate-500/20"
                     />
                     <button
                       type="button"
@@ -1243,7 +1243,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                       type="button"
                       onClick={() => setHoras(4)}
                       className={`px-1.5 py-0.5 text-[9px] rounded-md font-mono border ${
-                        horas === 4 ? 'bg-[#07474e] border-[#07474e] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
+                        horas === 4 ? 'bg-slate-800 border-slate-800 text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
                       }`}
                     >
                       4h
@@ -1252,7 +1252,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                       type="button"
                       onClick={() => setHoras(8)}
                       className={`px-1.5 py-0.5 text-[9px] rounded-md font-mono border ${
-                        horas === 8 ? 'bg-[#07474e] border-[#07474e] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
+                        horas === 8 ? 'bg-slate-800 border-slate-800 text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
                       }`}
                     >
                       8h
@@ -1261,7 +1261,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                       type="button"
                       onClick={() => setHoras(9.5)}
                       className={`px-1.5 py-0.5 text-[9px] rounded-md font-mono border ${
-                        horas === 9.5 ? 'bg-[#07474e] border-[#07474e] text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
+                        horas === 9.5 ? 'bg-slate-800 border-slate-800 text-white' : 'bg-[#f8fafc] text-gray-500 border-gray-200 hover:bg-gray-150'
                       }`}
                     >
                       9.5h
@@ -1279,7 +1279,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
               {/* Tareas */}
               <div className="flex flex-col gap-1.5" id="field-descripcion">
                 <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-[#07474e]" />
+                  <FileText className="w-3.5 h-3.5 text-slate-808" />
                   Tareas Realizadas (Fin de Jornada)
                 </label>
                 <textarea
@@ -1287,7 +1287,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                   onChange={(e) => setDescripcion(e.target.value)}
                   placeholder="Ej: Instalación de tuberías, remates, cableado, desescombro..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-850 placeholder:text-gray-400"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-gray-850 placeholder:text-gray-400"
                 />
                 {formValidationErrors.descripcion && (
                   <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1">
@@ -1304,7 +1304,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                         key={idx}
                         type="button"
                         onClick={() => handleQuickPhrase(p)}
-                        className="px-2 py-1 text-[9px] bg-[#f8fafc] hover:bg-[#07474e]/10 text-gray-600 hover:text-[#07474e] rounded-md text-left border border-gray-200 transition-colors cursor-pointer truncate max-w-full"
+                        className="px-2 py-1 text-[9px] bg-[#f8fafc] hover:bg-slate-100 text-slate-658 hover:text-slate-900 rounded-md text-left border border-gray-200 transition-colors cursor-pointer truncate max-w-full"
                       >
                         + {p.replace(/\.$/, '')}
                       </button>
@@ -1317,7 +1317,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
               <div className="flex flex-col gap-1.5" id="field-materiales">
                 <label className="text-xs font-semibold text-gray-700 font-mono uppercase tracking-wider flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <Database className="w-3.5 h-3.5 text-[#07474e]" />
+                    <Database className="w-3.5 h-3.5 text-slate-808" />
                     Materiales Consumidos
                   </span>
                   <span className="text-[10px] text-gray-400 normal-case italic">Opcional</span>
@@ -1327,7 +1327,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                   value={materiales}
                   onChange={(e) => setMateriales(e.target.value)}
                   placeholder="Ej: 3 Sacos Yeso, 5m cable cobre..."
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium text-gray-800"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-gray-800"
                 />
               </div>
 
@@ -1336,7 +1336,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] disabled:bg-gray-300 text-white font-bold py-3.5 px-6 rounded-2xl shadow-sm text-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer font-sans"
+                  className="w-full bg-slate-800 hover:bg-slate-705 active:scale-[0.98] disabled:bg-gray-300 text-white font-bold py-3.5 px-6 rounded-2xl shadow-sm text-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer font-sans"
                 >
                   {isSubmitting ? (
                     <>
@@ -1388,7 +1388,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
       <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 font-mono uppercase tracking-wide">
-            <ClipboardList className="w-4 h-4 text-[#07474e]" />
+            <ClipboardList className="w-4 h-4 text-slate-808" />
             Historial de Hoy ({partesHoy.length})
           </h3>
           {partesHoy.length > 0 && (
@@ -1420,7 +1420,7 @@ export default function ParteDiarioForm({ user, forceMobileLayout = false }: Par
                 className="p-3 bg-[#f8fafc] border border-gray-150 rounded-xl flex flex-col gap-2 relative hover:bg-gray-100/50 transition-colors"
               >
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 bg-teal-50 text-[#07474e] text-[10px] font-bold rounded-md max-w-[190px] truncate">
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-800 text-[10px] font-bold rounded-md max-w-[190px] truncate">
                     💼 {getObraName(parte.obra_id)}
                   </span>
                   <span className="text-[10px] font-bold font-mono text-gray-600 bg-white border border-gray-200 px-1.5 py-0.5 rounded-md flex items-center gap-1">

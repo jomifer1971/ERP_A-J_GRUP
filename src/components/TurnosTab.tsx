@@ -321,7 +321,7 @@ export default function TurnosTab() {
 
           {/* New Turno Form Expansion */}
           <form onSubmit={handleAddTurno} className="bg-[#f8fafc] border border-gray-200 rounded-3xl p-4 flex flex-col gap-4 mt-2">
-            <span className="text-[10px] font-black font-mono uppercase text-[#07474e]">Crear Nueva Plantilla de Turno</span>
+            <span className="text-[10px] font-black font-mono uppercase text-slate-800">Crear Nueva Plantilla de Turno</span>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1">
@@ -355,7 +355,7 @@ export default function TurnosTab() {
                   type="time" 
                   value={horaInicio}
                   onChange={e => setHoraInicio(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold font-mono text-[#07474e]"
+                  className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold font-mono text-slate-800"
                   required
                 />
               </div>
@@ -365,7 +365,7 @@ export default function TurnosTab() {
                   type="time" 
                   value={horaFin}
                   onChange={e => setHoraFin(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold font-mono text-[#07474e]"
+                  className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-bold font-mono text-slate-800"
                   required
                 />
               </div>
@@ -397,7 +397,7 @@ export default function TurnosTab() {
 
             <button 
               type="submit" 
-              className="py-2.5 bg-[#07474e] hover:bg-[#07474e]/90 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-sm"
+              className="py-2.5 bg-slate-850 hover:bg-slate-750 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-sm"
             >
               Registrar Plantilla de Turno
             </button>
@@ -423,7 +423,7 @@ export default function TurnosTab() {
                 type="date"
                 value={festivoFecha}
                 onChange={e => setFestivoFecha(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-250 rounded-xl text-xs font-bold font-mono text-[#07474e]"
+                className="w-full px-3 py-2 border border-gray-250 rounded-xl text-xs font-bold font-mono text-slate-800"
                 required
               />
             </div>

@@ -679,7 +679,7 @@ export default function AlmacenesTab() {
                         <h4 className="text-xs font-black text-slate-900 leading-snug">{result.articulo}</h4>
                         <span className="text-[10px] font-mono text-gray-400 block mt-0.5">Suministro de construcción</span>
                       </div>
-                      <span className="text-xs font-black font-mono text-[#07474e] bg-white border px-2.5 py-1 rounded-xl shadow-4xs whitespace-nowrap">
+                      <span className="text-xs font-black font-mono text-slate-700 bg-white border px-2.5 py-1 rounded-xl shadow-4xs whitespace-nowrap">
                         {result.cantidad} {result.unidad}
                       </span>
                     </div>
@@ -719,7 +719,7 @@ export default function AlmacenesTab() {
                             {result.operariosActivos.map(op => (
                               <div key={op.id} className="flex items-center justify-between gap-2.5 p-2 bg-[#f8fafc] border border-gray-150 rounded-lg text-xs font-semibold">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-full bg-teal-50 border border-teal-250 flex items-center justify-center text-[#07474e] text-[10px] font-black">
+                                  <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800 text-[10px] font-black">
                                     {op.nombre.substring(0,2).toUpperCase()}
                                   </div>
                                   <div>
@@ -731,7 +731,7 @@ export default function AlmacenesTab() {
                                 {op.telefono ? (
                                   <a
                                     href={`tel:${op.telefono}`}
-                                    className="flex items-center gap-1 px-2 py-1 bg-[#07474e] hover:bg-[#0b5c65] text-white rounded-lg text-[10px] font-bold font-mono uppercase tracking-wider transition-all no-underline shadow-4xs border-none cursor-pointer"
+                                    className="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-[10px] font-bold font-mono uppercase tracking-wider transition-all no-underline shadow-4xs border-none cursor-pointer"
                                   >
                                     <Phone className="w-3 h-3 text-emerald-400" />
                                     {op.telefono}
@@ -763,7 +763,7 @@ export default function AlmacenesTab() {
         {/* Card 1: ALMACÉN CENTRAL */}
         <div className="bg-white rounded-3xl p-5 md:p-6 border border-gray-200/90 shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between gap-2 border-b pb-3 border-gray-100">
-            <div className="flex items-center gap-1.5 text-[#07474e]">
+            <div className="flex items-center gap-1.5 text-slate-800">
               <Warehouse className="w-5 h-5 shrink-0" />
               <h2 className="text-sm font-black font-mono uppercase tracking-wider">📦 ALMACÉN CENTRAL (Logística Central)</h2>
             </div>
@@ -783,7 +783,7 @@ export default function AlmacenesTab() {
                 <div key={it.id} className="flex items-center justify-between gap-3 bg-[#f8fafc] border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
                   <span className="text-gray-850 truncate max-w-[250px]">{it.articulo}</span>
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-[#07474e] font-mono whitespace-nowrap bg-white border px-2 py-1 rounded shadow-3xs text-[11px]">
+                    <span className="font-bold text-slate-700 font-mono whitespace-nowrap bg-white border px-2 py-1 rounded shadow-3xs text-[11px]">
                       {it.cantidad} {it.unidad}
                     </span>
                     <button
@@ -828,7 +828,7 @@ export default function AlmacenesTab() {
               <select
                 value={nuevaUnidad}
                 onChange={e => setNuevaUnidad(e.target.value)}
-                className="w-full px-2 py-2 bg-white border border-gray-250 rounded-xl text-xs font-bold text-[#07474e] font-mono"
+                className="w-full px-2 py-2 bg-white border border-gray-250 rounded-xl text-xs font-bold text-slate-800 font-mono"
               >
                 <option value="unidades">unidades</option>
                 <option value="sacos">sacos</option>
@@ -841,7 +841,7 @@ export default function AlmacenesTab() {
 
             <button
               type="submit"
-              className="py-2 px-3 bg-[#07474e] hover:bg-[#0b4e56] text-white text-xs font-black rounded-xl transition-all shadow-3xs shrink-0 w-full sm:w-auto flex items-center justify-center"
+              className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black rounded-xl transition-all shadow-3xs shrink-0 w-full sm:w-auto flex items-center justify-center"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -924,7 +924,7 @@ export default function AlmacenesTab() {
                 onClick={() => setTransfOrigin('central')}
                 className={`flex-1 py-2 rounded-xl text-center text-xs font-black font-mono uppercase tracking-wide border transition-all ${
                   transfOrigin === 'central'
-                    ? 'bg-[#07474e] text-white border-[#07474e] shadow-xs'
+                    ? 'bg-slate-800 text-white border-slate-800 shadow-xs'
                     : 'bg-white text-gray-500 border-gray-200'
                 }`}
               >
@@ -1006,7 +1006,7 @@ export default function AlmacenesTab() {
             <button
               type="submit"
               className={`w-full py-2.5 text-white text-xs font-black font-mono uppercase tracking-wider rounded-xl transition-all shadow-sm ${
-                transfOrigin === 'central' ? 'bg-[#07474e] hover:bg-[#0b4e56]' : 'bg-indigo-700 hover:bg-indigo-850'
+                transfOrigin === 'central' ? 'bg-slate-800 hover:bg-slate-700' : 'bg-indigo-700 hover:bg-indigo-850'
               }`}
             >
               Confirmar Traspaso de Material
@@ -1069,15 +1069,15 @@ export default function AlmacenesTab() {
                 <button
                   type="button"
                   onClick={() => document.getElementById('ocr-camera-input')?.click()}
-                  className="w-full py-3 bg-[#07474e] hover:bg-[#0c5962] text-white font-bold font-mono text-xs uppercase rounded-xl tracking-wider shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer leading-none"
+                  className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold font-mono text-xs uppercase rounded-xl tracking-wider shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer leading-none"
                   title="Hacer foto o subir PDF / Imagen"
                 >
-                  <Camera className="w-4 h-4 text-emerald-250" />
+                  <Camera className="w-4 h-4 text-slate-300" />
                   Hacer Foto / Cargar Archivo
                 </button>
               </div>
 
-              <div className="flex flex-col gap-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+               <div className="flex flex-col gap-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                 <span className="text-[9px] font-bold text-gray-400 font-mono uppercase tracking-wider">Plantillas rápidas para pruebas:</span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mt-1">
                   {ALBARANES_TEMPLATES.map((tmpl, idx) => (
@@ -1086,9 +1086,9 @@ export default function AlmacenesTab() {
                       key={idx}
                       onClick={() => handleOcrTemplateSelect(tmpl)}
                       disabled={isScanning}
-                      className="flex flex-col items-start gap-1 p-2 bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/10 rounded-xl text-left transition-all disabled:opacity-50"
+                      className="flex flex-col items-start gap-1 p-2 bg-white border border-slate-200 hover:border-slate-450 hover:bg-slate-50/10 rounded-xl text-left transition-all disabled:opacity-50"
                     >
-                      <span className="text-[9px] font-black font-mono text-[#07474e] truncate w-full leading-tight">{tmpl.empresa.split(/[\s,]+/)[0]}</span>
+                      <span className="text-[9px] font-black font-mono text-slate-800 truncate w-full leading-tight">{tmpl.empresa.split(/[\s,]+/)[0]}</span>
                       <span className="text-[8px] text-gray-400 font-mono">{tmpl.items.length} art. • {tmpl.nroAlbaran.split('-').pop()}</span>
                     </button>
                   ))}
