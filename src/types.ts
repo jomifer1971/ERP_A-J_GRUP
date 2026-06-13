@@ -12,6 +12,11 @@ export interface Usuario {
   especialidades?: string[];
   jefeId?: string;
   telefono?: string;
+  dni?: string;
+  fechaNacimiento?: string;
+  direccion?: string;
+  rgpdFirmado?: boolean;
+  telegramChatId?: string; // Telegram Chat ID specifically for receiving work notices
 }
 
 export interface Obra {

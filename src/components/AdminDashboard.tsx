@@ -22,7 +22,9 @@ import {
   ShieldCheck,
   SmartphoneNfc,
   Cog,
-  Volume2
+  Volume2,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { enviarNotificacionReal, ConfigNotificaciones, DEFAULT_CONFIG_NOTIF } from '../utils/notificaciones';
@@ -53,6 +55,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
   const [notifMargin, setNotifMargin] = useState<number>(15); // courteous margin in minutes
   const [channelSms, setChannelSms] = useState<boolean>(true);
   const [channelTelegram, setChannelTelegram] = useState<boolean>(true);
+  const [isSimuladorCollapsed, setIsSimuladorCollapsed] = useState<boolean>(true);
 
   // Load and save alerts from LocalStorage for seamless UX
   const [alertas, setAlertas] = useState<AlertaNotificacion[]>(() => {
@@ -154,13 +157,11 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
     setAlertas(prev => [newAl, ...prev]);
     setShowActiveMobilePopup(newAl);
 
-    // If real notification channel is toggled on, dispatch a live notification!
-    if (configNotif.activo) {
-      try {
-        await enviarNotificacionReal(type, randomOp, msg, randomObra);
-      } catch (err) {
-        console.error('Error enviando notificación en vivo:', err);
-      }
+    // For simulated testing buttons, we bypass the active toggle so you receive the Telegram instantly
+    try {
+      await enviarNotificacionReal(type, randomOp, msg, randomObra, true);
+    } catch (err) {
+      console.error('Error enviando notificación en vivo simulada:', err);
     }
 
     // Auto-dismiss the popup simulation after 8 seconds
@@ -301,7 +302,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
       </div>
 
       {/* CUSTOM SECTION: NOTIFICATIONS HUB & ALERT DISPATCH SYSTEM */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-1 items-start">
         
         {/* Left Column: Notification Alerts manager (lg:span-7) */}
         <div className="lg:col-span-7 bg-white rounded-3xl shadow-sm border border-gray-200 p-5 md:p-6 flex flex-col gap-4">
@@ -400,82 +401,96 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
           
           {/* SIMULATE CONTROLLER PANEL CARD */}
           <div className="bg-slate-900 text-white rounded-3xl p-5 md:p-6 border border-slate-800 flex flex-col gap-4">
-            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest font-mono flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              Entorno Simulador de Campo
-            </span>
-            
-            <h3 className="text-base font-black tracking-tight text-white leading-tight">Probar Alertas de Fichajes</h3>
-            <p className="text-xs text-slate-400 leading-normal">
-              Utiliza los disparadores tácticos inferiores para simular retrasos en tiempo real y comprobar cómo repercute en los directivos.
-            </p>
-
-            <div className="flex flex-col gap-2.5 mt-1">
-              <button
-                onClick={() => triggerSimulation('RETRASO')}
-                className="w-full py-3 bg-amber-500 hover:bg-amber-650 text-slate-950 font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                title="Genera un fichaje tardío automatizado en tiempo de obra"
-              >
-                <Clock className="w-4 h-4 text-slate-950" />
-                Simular Fichaje Tardío
-              </button>
-
-              <button
-                onClick={() => triggerSimulation('AUSENCIA')}
-                className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                title="Genera una alerta de ausencia habiendo superado la cortesía"
-              >
-                <AlertTriangle className="w-4 h-4 text-white" />
-                Simular Ausencia de Entrada
-              </button>
-            </div>
-
-            <div className="border-t border-slate-800 pt-4 flex flex-col gap-3">
-              <span className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-wider">Parámetros del Despachador:</span>
-              
-              {/* Margin of tolerance input slider */}
-              <div className="flex flex-col gap-1.5 bg-slate-800/50 p-3 rounded-2xl border border-slate-800">
-                <div className="flex justify-between items-center text-xs text-slate-350">
-                  <span className="font-mono">Margen de Cortesía:</span>
-                  <span className="font-bold text-[#99f6e4] font-mono">{notifMargin} minutos</span>
-                </div>
-                <input 
-                  type="range" 
-                  min="5" 
-                  max="45" 
-                  step="5"
-                  value={notifMargin} 
-                  onChange={(e) => setNotifMargin(Number(e.target.value))}
-                  className="w-full accent-emerald-400 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                />
-                <span className="text-[9px] text-slate-500 leading-normal">
-                  Los avisos de incomparecencia se disparan si no entran tras {notifMargin} min del inicio de turno.
+            <div 
+              onClick={() => setIsSimuladorCollapsed(!isSimuladorCollapsed)}
+              className="flex items-center justify-between cursor-pointer select-none hover:opacity-90 transition-opacity"
+            >
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest font-mono flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  Entorno Simulador de Campo
                 </span>
+                <h3 className="text-sm md:text-base font-black tracking-tight text-white leading-tight">Probar Alertas de Fichajes</h3>
               </div>
-
-              {/* Channels checkboxes */}
-              <div className="flex items-center justify-between gap-3 text-xs text-slate-300">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={channelSms} 
-                    onChange={e => setChannelSms(e.target.checked)} 
-                    className="rounded border-slate-800 text-emerald-500 focus:ring-transparent focus:ring-offset-0 bg-slate-850"
-                  />
-                  <span>Despacho SMS CEO</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={channelTelegram} 
-                    onChange={e => setChannelTelegram(e.target.checked)} 
-                    className="rounded border-slate-800 text-emerald-500 focus:ring-transparent focus:ring-offset-0 bg-slate-850"
-                  />
-                  <span>Canal Telegram Jefe</span>
-                </label>
+              <div className="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-slate-350 shrink-0">
+                {isSimuladorCollapsed ? <ChevronDown className="w-4.5 h-4.5" /> : <ChevronUp className="w-4.5 h-4.5" />}
               </div>
-
             </div>
+
+            {!isSimuladorCollapsed && (
+              <div className="flex flex-col gap-4 animate-fadeIn">
+                <p className="text-xs text-slate-400 leading-normal">
+                  Utiliza los disparadores tácticos inferiores para simular retrasos en tiempo real y comprobar cómo repercute en los directivos.
+                </p>
+
+                <div className="flex flex-col gap-2.5 mt-1">
+                  <button
+                    onClick={() => triggerSimulation('RETRASO')}
+                    className="w-full py-3 bg-amber-500 hover:bg-amber-655 text-slate-950 font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    title="Genera un fichaje tardío automatizado en tiempo de obra"
+                  >
+                    <Clock className="w-4 h-4 text-slate-950" />
+                    Simular Fichaje Tardío
+                  </button>
+
+                  <button
+                    onClick={() => triggerSimulation('AUSENCIA')}
+                    className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    title="Genera una alerta de ausencia habiendo superado la cortesía"
+                  >
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                    Simular Ausencia de Entrada
+                  </button>
+                </div>
+
+                <div className="border-t border-slate-800 pt-4 flex flex-col gap-3">
+                  <span className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-wider">Parámetros del Despachador:</span>
+                  
+                  {/* Margin of tolerance input slider */}
+                  <div className="flex flex-col gap-1.5 bg-slate-800/50 p-3 rounded-2xl border border-slate-800">
+                    <div className="flex justify-between items-center text-xs text-slate-350">
+                      <span className="font-mono">Margen de Cortesía:</span>
+                      <span className="font-bold text-[#99f6e4] font-mono">{notifMargin} minutos</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="5" 
+                      max="45" 
+                      step="5"
+                      value={notifMargin} 
+                      onChange={(e) => setNotifMargin(Number(e.target.value))}
+                      className="w-full accent-emerald-400 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span className="text-[9px] text-slate-500 leading-normal">
+                      Los avisos de incomparecencia se disparan si no entran tras {notifMargin} min del inicio de turno.
+                    </span>
+                  </div>
+
+                  {/* Channels checkboxes */}
+                  <div className="flex items-center justify-between gap-3 text-xs text-slate-300">
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={channelSms} 
+                        onChange={e => setChannelSms(e.target.checked)} 
+                        className="rounded border-slate-800 text-emerald-500 focus:ring-transparent focus:ring-offset-0 bg-slate-850"
+                      />
+                      <span>Despacho SMS CEO</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={channelTelegram} 
+                        onChange={e => setChannelTelegram(e.target.checked)} 
+                        className="rounded border-slate-800 text-emerald-500 focus:ring-transparent focus:ring-offset-0 bg-slate-850"
+                      />
+                      <span>Canal Telegram Jefe</span>
+                    </label>
+                  </div>
+
+                </div>
+              </div>
+            )}
           </div>
 
           {/* REAL TELEGRAM AND WEBHOOK GATEWAY CONFIGURATION */}
@@ -662,16 +677,16 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
                   };
                   setShowActiveMobilePopup(pushAl);
 
-                  if (configNotif.activo) {
-                    try {
-                      await enviarNotificacionReal(
-                        'AUSENCIA',
-                        workerName,
-                        `⚠️ ALARMA ANTI-FRAUDE: ¡Se ha intentado engañar al GPS! El operario intentó registrar un fichaje con ubicación simulada o falseada (Fake GPS/Simulador) en la obra ${mockObra}. Intento bloqueado de forma segura.`,
-                        mockObra
-                      );
-                    } catch (e) {}
-                  }
+                  // For simulated spoofing, we bypass the active toggle to ensure you receive the Telegram immediately
+                  try {
+                    await enviarNotificacionReal(
+                      'AUSENCIA',
+                      workerName,
+                      `⚠️ ALARMA ANTI-FRAUDE: ¡Se ha intentado engañar al GPS! El operario intentó registrar un fichaje con ubicación simulada o falseada (Fake GPS/Simulador) en la obra ${mockObra}. Intento bloqueado de forma segura.`,
+                      mockObra,
+                      true
+                    );
+                  } catch (e) {}
 
                   setTimeout(() => {
                     setShowActiveMobilePopup(null);

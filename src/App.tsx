@@ -9,13 +9,14 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ParteDiarioForm from './components/ParteDiarioForm';
 import Logo from './components/Logo';
-import { LogOut, User as UserIcon, Database, Wifi, WifiOff, LayoutDashboard, Briefcase, Warehouse, UserCheck, ShieldCheck, Clock8, Smartphone, Monitor, Menu, X, ChevronDown } from 'lucide-react';
+import { LogOut, User as UserIcon, Database, Wifi, WifiOff, LayoutDashboard, Briefcase, Warehouse, UserCheck, ShieldCheck, Clock8, Smartphone, Monitor, Menu, X, ChevronDown, Users } from 'lucide-react';
 import { isSupabaseConfigured } from './config/supabaseClient';
 import ObrasTab from './components/ObrasTab';
 import AlmacenesTab from './components/AlmacenesTab';
 import CuentaTab from './components/CuentaTab';
 import TurnosTab from './components/TurnosTab';
 import RolesTab from './components/RolesTab';
+import OperariosTab from './components/OperariosTab';
 
 export default function App() {
   const currentYear = new Date().getFullYear();
@@ -32,7 +33,7 @@ export default function App() {
     return null;
   });
 
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'fichaje' | 'obras' | 'almacenes' | 'cuenta' | 'turnos' | 'roles'>(() => {
+  const [activeTab, setActiveTab ] = useState<'dashboard' | 'fichaje' | 'obras' | 'almacenes' | 'cuenta' | 'turnos' | 'roles' | 'operarios'>(() => {
     const saved = localStorage.getItem('aj_user_session');
     if (saved) {
       try {
@@ -143,6 +144,7 @@ export default function App() {
               {activeTab === 'cuenta' && <UserCheck className="w-4 h-4 text-[#99f6e4]" />}
               {activeTab === 'turnos' && <Clock8 className="w-4 h-4 text-indigo-300 animate-pulse" />}
               {activeTab === 'roles' && <ShieldCheck className="w-4 h-4 text-rose-400" />}
+              {activeTab === 'operarios' && <Users className="w-4 h-4 text-teal-400" />}
               
               <span>
                 Menú: {
@@ -152,7 +154,8 @@ export default function App() {
                   activeTab === 'almacenes' ? 'Almacenes y OCR' :
                   activeTab === 'cuenta' ? 'Ficha y Estadísticas' :
                   activeTab === 'turnos' ? 'Turnos y Horarios' :
-                  activeTab === 'roles' ? 'Seguridad / Roles' : 'Sección'
+                  activeTab === 'roles' ? 'Seguridad / Roles' :
+                  activeTab === 'operarios' ? 'Personal y RGPD' : 'Sección'
                 }
               </span>
             </div>
@@ -261,6 +264,19 @@ export default function App() {
                   >
                     <ShieldCheck className="w-4 h-4 text-rose-600" />
                     Seguridad / Roles
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('operarios'); setMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 p-3 text-xs font-bold font-mono uppercase rounded-xl transition-all ${
+                      activeTab === 'operarios'
+                        ? 'bg-teal-50 text-[#07474e] border-l-4 border-[#07474e]'
+                        : 'bg-white text-gray-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Users className="w-4 h-4 text-teal-600" />
+                    Personal y RGPD
                   </button>
                 </>
               )}
@@ -415,6 +431,10 @@ export default function App() {
 
         {isAdmin && activeTab === 'roles' && (
           <RolesTab user={user} />
+        )}
+
+        {isAdmin && activeTab === 'operarios' && (
+          <OperariosTab user={user} />
         )}
 
       </main>
