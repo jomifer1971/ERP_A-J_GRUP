@@ -27,12 +27,25 @@ export default function Login({ onLogin }: LoginProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Multi-view state: 'login' | 'forgot' | 'register'
+  const [activeView, setActiveView] = useState<'login' | 'forgot' | 'register'>('login');
+
   // Password Recovery States
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoverySuccess, setRecoverySuccess] = useState(false);
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [recoveryError, setRecoveryError] = useState('');
+
+  // Registration States
+  const [regNombre, setRegNombre] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regTelefono, setRegTelefono] = useState('');
+  const [regRol, setRegRol] = useState<'operario' | 'jefe_equipo'>('operario');
+  const [regPassword, setRegPassword] = useState('');
+  const [regEspecialidades, setRegEspecialidades] = useState<string[]>([]);
+  const [regSuccess, setRegSuccess] = useState(false);
+  const [regError, setRegError] = useState('');
+  const [regLoading, setRegLoading] = useState(false);
 
   // In a real app we would use Supabase Auth: await supabase.auth.signInWithPassword({ email, password })
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,9 +71,10 @@ export default function Login({ onLogin }: LoginProps) {
         } catch {}
       } else {
         localStorage.setItem('aj_users_v2', JSON.stringify(MOCK_USERS));
-      }
+       }
 
-      let user = systemUsers.find(u => u.email === email.trim().toLowerCase() && password === '123456');
+      // Check users checking set password or default 123456
+      let user = systemUsers.find(u => u.email === email.trim().toLowerCase() && password === (u.password || '123456'));
       if (!user && password === '123456') {
         const newUser: Usuario = {
           id: `u-${Date.now()}`,
@@ -81,9 +95,79 @@ export default function Login({ onLogin }: LoginProps) {
           onLogin(user);
         }
       } else {
-        setError('Credenciales incorrectas (Usa: rol@ajgrup.com / 123456)');
+        setError('Credenciales incorrectas (Usa tu email y clave. O de prueba: rol@ajgrup.com / 123456)');
       }
     }, 800);
+  };
+
+  const handleRegisterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegError('');
+    setRegSuccess(false);
+
+    if (!regNombre.trim()) {
+      setRegError('Por favor, escribe tu nombre completo.');
+      return;
+    }
+    if (!regEmail.trim()) {
+      setRegError('Por favor, escribe tu email de contacto.');
+      return;
+    }
+    if (!regTelefono.trim()) {
+      setRegError('Por favor, indica tu número de teléfono.');
+      return;
+    }
+    if (!regPassword.trim() || regPassword.length < 4) {
+      setRegError('Por favor, elige una contraseña de al menos 4 caracteres.');
+      return;
+    }
+
+    setRegLoading(true);
+
+    setTimeout(() => {
+      setRegLoading(false);
+
+      let systemUsers = [...MOCK_USERS];
+      const saved = localStorage.getItem('aj_users_v2');
+      if (saved) {
+        try {
+          systemUsers = JSON.parse(saved);
+        } catch {}
+      } else {
+        localStorage.setItem('aj_users_v2', JSON.stringify(MOCK_USERS));
+      }
+
+      const emailLower = regEmail.trim().toLowerCase();
+      const duplicate = systemUsers.find(u => u.email === emailLower);
+      if (duplicate) {
+        setRegError('Este correo electrónico ya está registrado.');
+        return;
+      }
+
+      const newUser: Usuario = {
+        id: `u-${Date.now()}`,
+        nombre: regNombre.trim(),
+        email: emailLower,
+        rol: regRol,
+        validado: false, // MUST BE APPROVED BY ADMIN
+        password: regPassword,
+        especialidades: regEspecialidades.length > 0 ? regEspecialidades : ['paleta'],
+        telefono: regTelefono.trim(),
+        rgpdFirmado: false,
+      };
+
+      systemUsers.push(newUser);
+      localStorage.setItem('aj_users_v2', JSON.stringify(systemUsers));
+      setRegSuccess(true);
+    }, 1000);
+  };
+
+  const toggleEspecialidad = (esp: string) => {
+    if (regEspecialidades.includes(esp)) {
+      setRegEspecialidades(regEspecialidades.filter(e => e !== esp));
+    } else {
+      setRegEspecialidades([...regEspecialidades, esp]);
+    }
   };
 
   const handleRecoverySubmit = (e: React.FormEvent) => {
@@ -133,7 +217,7 @@ export default function Login({ onLogin }: LoginProps) {
 
         {/* Dynamic Inner Panel Section */}
         <div className="px-8 py-8 bg-white relative z-20">
-          {!showForgotPassword ? (
+          {activeView === 'login' && (
             <>
               <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 Iniciar Sesión
@@ -142,7 +226,7 @@ export default function Login({ onLogin }: LoginProps) {
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider font-mono">Email corporativo</label>
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider font-mono">Email corporativo o contacto</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                       <Mail className="w-5 h-5" />
@@ -163,7 +247,7 @@ export default function Login({ onLogin }: LoginProps) {
                     <button
                       type="button"
                       onClick={() => {
-                        setShowForgotPassword(true);
+                        setActiveView('forgot');
                         setRecoveryEmail(email);
                         setRecoverySuccess(false);
                         setRecoveryError('');
@@ -197,7 +281,7 @@ export default function Login({ onLogin }: LoginProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-4 w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans"
+                  className="mt-4 w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans cursor-pointer"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -210,20 +294,43 @@ export default function Login({ onLogin }: LoginProps) {
                 </button>
               </form>
 
+              <div className="mt-5 text-center">
+                <p className="text-xs text-gray-500">
+                  ¿Es la primera vez que entras?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveView('register');
+                      setRegSuccess(false);
+                      setRegError('');
+                      setRegNombre('');
+                      setRegEmail('');
+                      setRegTelefono('');
+                      setRegPassword('');
+                      setRegEspecialidades([]);
+                    }}
+                    className="font-bold text-[#07474e] hover:text-[#0b4e56] hover:underline cursor-pointer"
+                  >
+                    Regístrate aquí
+                  </button>
+                </p>
+              </div>
+
               {/* Development fast-access keys */}
               <div className="mt-8 border-t border-dashed border-gray-200 pt-6">
                 <p className="text-[10px] text-gray-400 font-mono text-center mb-3">ACCESOS RÁPIDOS SIMULADOS (DEV)</p>
                 <div className="flex flex-wrap justify-center gap-2">
-                  <button type="button" onClick={() => autofill('ceo@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase">CEO</button>
-                  <button type="button" onClick={() => autofill('admin@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase">Admin</button>
-                  <button type="button" onClick={() => autofill('jefe@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase">Jefe Equipo</button>
-                  <button type="button" onClick={() => autofill('juan@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase">Operario</button>
-                  <button type="button" onClick={() => autofill('nuevo@ajgrup.com')} className="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded hover:bg-red-100 uppercase border border-red-200">No Válido</button>
+                  <button type="button" onClick={() => autofill('ceo@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase cursor-pointer">CEO</button>
+                  <button type="button" onClick={() => autofill('admin@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase cursor-pointer">Admin</button>
+                  <button type="button" onClick={() => autofill('jefe@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase cursor-pointer">Jefe Equipo</button>
+                  <button type="button" onClick={() => autofill('juan@ajgrup.com')} className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-200 uppercase cursor-pointer">Operario</button>
+                  <button type="button" onClick={() => autofill('nuevo@ajgrup.com')} className="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded hover:bg-red-100 uppercase border border-red-200 cursor-pointer">No Válido</button>
                 </div>
               </div>
             </>
-          ) : (
-            // Forgotten Password Flow Rendering Section
+          )}
+
+          {activeView === 'forgot' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
                 Recuperar Contraseña
@@ -240,10 +347,10 @@ export default function Login({ onLogin }: LoginProps) {
                   </div>
                   <button
                     onClick={() => {
-                      setShowForgotPassword(false);
+                      setActiveView('login');
                       setRecoverySuccess(false);
                     }}
-                    className="mt-2 text-center text-xs font-bold text-[#07474e] hover:underline"
+                    className="mt-2 text-center text-xs font-bold text-[#07474e] hover:underline cursor-pointer"
                   >
                     Volver al inicio de sesión
                   </button>
@@ -277,7 +384,7 @@ export default function Login({ onLogin }: LoginProps) {
                     <button
                       type="submit"
                       disabled={recoveryLoading}
-                      className="w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-sm"
+                      className="w-full bg-[#07474e] hover:bg-[#0b4e56] active:scale-[0.98] transition-all text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm font-sans text-sm cursor-pointer"
                     >
                       {recoveryLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -288,13 +395,194 @@ export default function Login({ onLogin }: LoginProps) {
 
                     <button
                       type="button"
-                      onClick={() => setShowForgotPassword(false)}
-                      className="w-full py-2 bg-transparent text-gray-500 hover:text-gray-800 text-xs font-mono font-bold transition-all text-center"
+                      onClick={() => setActiveView('login')}
+                      className="w-full py-2 bg-transparent text-gray-500 hover:text-gray-800 text-xs font-mono font-bold transition-all text-center cursor-pointer"
                     >
                       &lt; Volver al Login
                     </button>
                   </div>
                 </form>
+              )}
+            </div>
+          )}
+
+          {activeView === 'register' && (
+            <div className="flex flex-col gap-4 animate-fadeIn">
+              {regSuccess ? (
+                <div className="flex flex-col gap-4 text-center py-4">
+                  {/* Warning Authorization state box */}
+                  <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center text-2xl font-bold mx-auto animate-bounce border border-amber-200 shadow-3xs">
+                    ⏳
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-mono font-black tracking-wider uppercase text-amber-700 bg-amber-100/65 px-2.5 py-1 rounded-full">
+                      Registro Pendiente de Aprobación
+                    </span>
+                    <h3 className="text-lg font-black text-gray-900 tracking-tight leading-tight">
+                      ¡Registro Solicitado con Éxito!
+                    </h3>
+                    <p className="text-xs text-gray-500 leading-normal max-w-sm mx-auto">
+                      Tu solicitud ha sido guardada en nuestra base de datos. Recuerda que para ingresar, <strong className="text-slate-800">un Administrador o el CEO debe autorizar y validar tu cuenta</strong>. 
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-2xl p-4 text-left text-xs border border-gray-100 space-y-1.5 font-sans">
+                    <div className="text-gray-400 font-mono text-[9px] uppercase font-bold tracking-wider">Tus datos de solicitud:</div>
+                    <div><span className="font-semibold text-gray-700">Empleado:</span> {regNombre}</div>
+                    <div><span className="font-semibold text-gray-700">Email:</span> {regEmail}</div>
+                    <div><span className="font-semibold text-gray-700">Rol Solicitado:</span> {regRol === 'jefe_equipo' ? 'Jefe de Equipo 👷‍♂️' : 'Operario de Campo 🛠️'}</div>
+                    <div><span className="font-semibold text-gray-700">Especialidades:</span> {regEspecialidades.join(', ') || 'paleta'}</div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setActiveView('login');
+                      setRegSuccess(false);
+                    }}
+                    className="w-full py-3 bg-[#07474e] hover:bg-[#0b5c65] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all font-mono mt-2 shadow-sm cursor-pointer"
+                  >
+                    Volver al inicio de sesión
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-1">
+                    <h2 className="text-lg font-black text-slate-800 tracking-tight">Registro de Empleado</h2>
+                    <p className="text-xs text-gray-500 leading-tight">Introduce tus datos e indica tu puesto. Sujeto a aprobación posterior.</p>
+                  </div>
+
+                  <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3.5 mt-2">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">Nombre Completo</label>
+                      <input
+                        type="text"
+                        required
+                        value={regNombre}
+                        onChange={e => setRegNombre(e.target.value)}
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        placeholder="Ej. Manuel García López"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">Email Corporativo o Contacto</label>
+                      <input
+                        type="email"
+                        required
+                        value={regEmail}
+                        onChange={e => setRegEmail(e.target.value)}
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        placeholder="Ej. manuel@ajgrup.com o personal"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">Teléfono Móvil</label>
+                      <input
+                        type="text"
+                        required
+                        value={regTelefono}
+                        onChange={e => setRegTelefono(e.target.value)}
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        placeholder="Ej. +34 600 000 000"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">Rol Solicitado</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setRegRol('operario')}
+                          className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                            regRol === 'operario'
+                              ? 'bg-[#07474e] text-white border-[#07474e]'
+                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                          }`}
+                        >
+                          🛠️ Operario
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRegRol('jefe_equipo')}
+                          className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                            regRol === 'jefe_equipo'
+                              ? 'bg-[#07474e] text-white border-[#07474e]'
+                              : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                          }`}
+                        >
+                          👷‍♂️ Jefe de Equipo
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">Elegir Contraseña</label>
+                      <input
+                        type="password"
+                        required
+                        value={regPassword}
+                        onChange={e => setRegPassword(e.target.value)}
+                        className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#07474e]/20 focus:border-[#07474e] transition-all font-medium"
+                        placeholder="Mínimo 4 caracteres"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">Especialidades principales</label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {['paleta', 'electricista', 'fontanero', 'pintor', 'climas', 'pladur', 'soldador'].map(esp => {
+                          const active = regEspecialidades.includes(esp);
+                          return (
+                            <button
+                              key={esp}
+                              type="button"
+                              onClick={() => toggleEspecialidad(esp)}
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer capitalize ${
+                                active
+                                  ? 'bg-[#07474e]/10 text-[#07474e] border-[#07474e]/30'
+                                  : 'bg-white text-gray-650 border-gray-200 hover:bg-slate-50'
+                              }`}
+                            >
+                              {esp}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {regError && (
+                      <div className="bg-red-50 text-red-600 p-2.5 flex items-start gap-2 rounded-xl text-xs font-semibold border border-red-100 mt-1">
+                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                        <span>{regError}</span>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-2 mt-2">
+                      <button
+                        type="submit"
+                        disabled={regLoading}
+                        className="w-full py-3 bg-[#07474e] hover:bg-[#0b5c65] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all font-mono shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        {regLoading ? (
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                          'Solicitar Registro'
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveView('login')}
+                        className="w-full py-1.5 bg-transparent text-gray-500 hover:text-gray-800 text-xs font-mono font-bold transition-all text-center cursor-pointer"
+                      >
+                        &lt; Volver al Login
+                      </button>
+                    </div>
+
+                  </form>
+                </>
               )}
             </div>
           )}

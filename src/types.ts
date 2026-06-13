@@ -9,6 +9,7 @@ export interface Usuario {
   email: string;
   rol: 'ceo' | 'admin' | 'jefe_equipo' | 'operario';
   validado: boolean;
+  password?: string; // Optional password for login checks
   especialidades?: string[];
   jefeId?: string;
   telefono?: string;
